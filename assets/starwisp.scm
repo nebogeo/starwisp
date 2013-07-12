@@ -1,7 +1,8 @@
-(define (layout width height weight) (list "layout" width height weight))
+(define (layout width height weight gravity) (list "layout" width height weight gravity))
 (define (layout-width l) (list-ref l 1))
 (define (layout-height l) (list-ref l 2))
 (define (layout-weight l) (list-ref l 3))
+(define (layout-gravity l) (list-ref l 4))
 
 (define (linear-layout id orientation layout children)
   (list "linear-layout" id orientation layout children))
@@ -64,10 +65,10 @@
   (set! id-map (cons (list name (length id-map)) id-map))
   (get-id name))
 
-(define wrap (layout 'wrap-content 'wrap-content 1))
-(define fillwrap (layout 'fill-parent 'wrap-content 1))
-(define wrapfill (layout 'wrap-content 'fill-parent 1))
-(define fill (layout 'fill-parent 'fill-parent 1))
+(define wrap (layout 'wrap-content 'wrap-content 1 'left))
+(define fillwrap (layout 'fill-parent 'wrap-content 1 'left))
+(define wrapfill (layout 'wrap-content 'fill-parent 1 'left))
+(define fill (layout 'fill-parent 'fill-parent 1 'left))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,19 +108,19 @@
 
 (send (scheme->json
        (linear-layout
-        0
+        (make-id "top")
         'vertical
-        (layout 'fill-parent 'fill-parent 1)
+        (layout 'fill-parent 'fill-parent 1 'left)
         (list
          (spinner (make-id "spinner") (list "one" "two" "three" "cows") fillwrap 'spin)
          (edit-text (make-id "name") "Name" 20 fillwrap 'editlisten)
          (linear-layout
           (make-id "foo")
           'horizontal
-          (layout 'fill-parent 'wrap-content 1)
+          (layout 'fill-parent 'fill-parent 1 'centre)
           (list
-           (button (make-id "but1") "Click me" 20 (layout 'wrap-content 'wrap-content 0.3) 'hider)
-           (button (make-id "but3") "Boo" 20 (layout 'wrap-content 'wrap-content 0.5) 'hider)))
+           (button (make-id "but1") "Click me" 20 (layout 'wrap-content 'wrap-content 0 'centre) 'hider)
+           (button (make-id "but3") "Boo" 20 (layout 'wrap-content 'wrap-content 0 'centre) 'hider)))
          (text-view (make-id "view1") "This is the title" 10 fillwrap)
          (text-view (make-id "view2") "More texht" 40 fillwrap)
          (text-view (make-id "view3") "event More texht" 30 fillwrap)

@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.View;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.text.TextWatcher;
 import android.text.Editable;
@@ -53,6 +54,13 @@ public class starwisp extends Activity
         return LinearLayout.VERTICAL;
     }
 
+    public int BuildLayoutGravity(String p) {
+//        if (p.equals("centre")) return Gravity.CENTER;
+//        if (p.equals("left")) return Gravity.LEFT;
+//        if (p.equals("right")) return Gravity.RIGHT;
+        return Gravity.RIGHT;
+    }
+
     public int BuildLayoutParam(String p) {
         if (p.equals("fill-parent")) return LayoutParams.FILL_PARENT;
         if (p.equals("match-parent")) return LayoutParams.MATCH_PARENT;
@@ -68,9 +76,12 @@ public class starwisp extends Activity
 
     public LinearLayout.LayoutParams BuildLayoutParams(JSONArray arr) {
         try {
-            return new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
-                                    BuildLayoutParam(arr.getString(2)),
-                                    (float)arr.getDouble(3));
+            LinearLayout.LayoutParams lp =
+                new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
+                                              BuildLayoutParam(arr.getString(2)),
+                                              (float)arr.getDouble(3));
+            lp.gravity=BuildLayoutGravity(arr.getString(4));
+            return lp;
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
             return null;
