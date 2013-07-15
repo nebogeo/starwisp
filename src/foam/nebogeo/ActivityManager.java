@@ -1,6 +1,7 @@
 package foam.nebogeo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,16 +13,29 @@ import android.view.View;
 
 public class ActivityManager
 {
-    static public HashMap<String,Class> Activities;
+    static private HashMap<String,Class> m_Activities;
+
+    static {
+        m_Activities = new HashMap<String,Class>();
+    }
 
     static public void Register(String name, Class actclass)
     {
-        Activities.put(name,actclass);
+        Log.i("starwisp","adding "+name+" to activity registry");
+        m_Activities.put(name,actclass);
     }
 
     static public void StartActivity(Activity src, String name, int requestcode)
     {
-        Intent intent = new Intent(src,Activities.get(name));
-        startActivityForResult(intent, requestcode);
+        Class ActClass = m_Activities.get(name);
+        if (ActClass == null)
+        {
+            Log.i("starwisp","activity "+name+" not found in registry");
+        }
+        else
+        {
+            Intent intent = new Intent(src,ActClass);
+            src.startActivityForResult(intent, requestcode);
+        }
     }
 }

@@ -18,8 +18,8 @@ import org.json.JSONArray;
 public class StarwispActivity extends Activity
 {
     public String m_Name;
-    public Scheme m_Scheme;
-    public WidgetBuilder m_WidgetBuilder;
+    static public Scheme m_Scheme;
+    static public WidgetBuilder m_WidgetBuilder;
 
     @Override
     public void onCreate(Bundle savedInstanceState)

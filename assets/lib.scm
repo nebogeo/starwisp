@@ -241,7 +241,8 @@
 (define (spinner-listener t) (list-ref t 4))
 
 (define (toast msg) (list "toast" 0 "toast" msg))
-(define (switch-activity act request) (list "switch-activity" 0 "switch-activity" act request))
+(define (start-activity act request) (list "start-activity" 0 "start-activity" act request))
+(define (finish-activity result) (list "finish-activity" 0 "finish-activity" result))
 
 (define (update-widget type id token value) (list type id token value))
 

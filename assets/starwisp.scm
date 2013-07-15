@@ -33,7 +33,7 @@
              (lambda ()
                (list
                 (toast "hello dudes")
-                (switch-activity "two" 2)
+                (start-activity "two" 2)
                 (update-widget 'text-view (get-id "view1") 'text "I have been updated"))))
      (seek-bar (make-id "seek") 100 fillwrap
                (lambda (v)
@@ -51,12 +51,24 @@
 
   (activity
    "two"
-   (linear-layout)
+   (linear-layout
     (make-id "top")
     'vertical
     (layout 'fill-parent 'fill-parent 1 'left)
     (list
      (spinner (make-id "spinner") (list "one" "two" "three" "cows") fillwrap
               (lambda (v)
+                (list (toast "what's up doc?"))))
 
-                (list (toast "what's up doc?")))))))
+     (button (make-id "exit") "Exit" 50 fillwrap
+             (lambda ()
+               (list (finish-activity 99))))))
+
+   (lambda (activity)
+     (activity-layout activity))
+   (lambda (activity) '())
+   (lambda (activity) '())
+   (lambda (activity) '())
+   (lambda (activity) '())
+   (lambda (activity) '())
+   (lambda (activity) '())))

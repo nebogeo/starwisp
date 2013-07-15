@@ -38,12 +38,20 @@ import org.json.JSONArray;
 
 public class starwisp extends StarwispActivity
 {
+    static {
+        // register all activities here
+        ActivityManager.Register("main",starwisp.class);
+        ActivityManager.Register("two",TestActivity.class);
+    };
+
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         setContentView(R.layout.main);
 
+        // build static things
         m_Scheme = new Scheme(this);
         m_WidgetBuilder = new WidgetBuilder(m_Scheme);
         m_Name = "main";
@@ -53,10 +61,4 @@ public class starwisp extends StarwispActivity
 
         super.onCreate(savedInstanceState);
     }
-/*
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-	}
-*/
-
 }

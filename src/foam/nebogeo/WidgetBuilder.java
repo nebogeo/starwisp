@@ -256,6 +256,23 @@ public class WidgetBuilder
 
             Log.i("starwisp", "Update: "+type+" "+id+" "+token);
 
+
+            // non widget commands
+            if (token.equals("toast")) {
+                Toast msg = Toast.makeText(ctx.getBaseContext(),arr.getString(3),Toast.LENGTH_SHORT);
+                msg.show();
+            }
+
+            if (token.equals("start-activity")) {
+                ActivityManager.StartActivity(ctx,arr.getString(3),arr.getInt(4));
+            }
+
+            if (token.equals("finish-activity")) {
+                ctx.setResult(arr.getInt(3));
+                ctx.finish();
+            }
+
+            // now try and find the widget
             View vv=ctx.findViewById(id);
             if (vv==null)
             {
@@ -271,18 +288,6 @@ public class WidgetBuilder
             if (token.equals("show")) {
                 vv.setVisibility(View.VISIBLE);
             }
-
-            if (token.equals("toast")) {
-                Toast msg = Toast.makeText(ctx.getBaseContext(),arr.getString(3),Toast.LENGTH_SHORT);
-                msg.show();
-            }
-
-            if (token.equals("switch-activity")) {
-//                Class actclass = ActivityManager.FindActivity(arr.getString(3));
-//                Intent intent = new Intent(this,actclass);
-//                startActivityForResult(intent, arr.getInt(4));
-            }
-
 
             // special cases
             if (type.equals("text-view")) {
