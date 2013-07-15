@@ -160,7 +160,7 @@
       (if (and (not (null? v)) (not (list? (car v))) (pair? (car v)))
           (assoc->json v)
           (list->json v)))))
-   (else (display "value->js, unsupported type for ") (display v) (newline) 0)))
+   (else (display "value->js, unsupported type for ") (display v) (newline) "[]")))
 
 (define (list->json l)
   (define (_ l s)
@@ -194,6 +194,9 @@
 (define (layout-height l) (list-ref l 2))
 (define (layout-weight l) (list-ref l 3))
 (define (layout-gravity l) (list-ref l 4))
+
+(define (widget-type w) (list-ref w 0))
+(define (widget-id w) (list-ref w 1))
 
 (define (linear-layout id orientation layout children)
   (list "linear-layout" id orientation layout children))
@@ -229,7 +232,7 @@
 (define (seek-bar-id t) (list-ref t 1))
 (define (seek-bar-max t) (list-ref t 2))
 (define (seek-bar-layout t) (list-ref t 3))
-(define (button-listener t) (list-ref t 4))
+(define (seek-bar-listener t) (list-ref t 4))
 
 (define (spinner id items layout listener) (list "spinner" id items layout listener))
 (define (spinner-id t) (list-ref t 1))
@@ -238,6 +241,7 @@
 (define (spinner-listener t) (list-ref t 4))
 
 (define (toast msg) (list "toast" 0 "toast" msg))
+(define (switch-activity act request) (list "switch-activity" 0 "switch-activity" act request))
 
 (define (update-widget type id token value) (list type id token value))
 
@@ -260,3 +264,87 @@
 (define fillwrap (layout 'fill-parent 'wrap-content 1 'left))
 (define wrapfill (layout 'wrap-content 'fill-parent 1 'left))
 (define fill (layout 'fill-parent 'fill-parent 1 'left))
+
+(define (activity name layout on-create on-start on-resume on-pause on-stop on-destroy on-activity-result)
+  (list name layout on-create on-start on-resume on-pause on-stop on-destroy on-activity-result))
+
+(define (activity-name a) (list-ref a 0))
+(define (activity-layout a) (list-ref a 1))
+(define (activity-on-create a) (list-ref a 2))
+(define (activity-on-start a) (list-ref a 3))
+(define (activity-on-resume a) (list-ref a 4))
+(define (activity-on-pause a) (list-ref a 5))
+(define (activity-on-stop a) (list-ref a 6))
+(define (activity-on-destroy a) (list-ref a 7))
+(define (activity-on-activity-result a) (list-ref a 8))
+
+(define (activity-list l) l)
+
+(define (activity-list-find l name)
+  (cond
+   ((null? l) #f)
+   ((equal? (activity-name (car l)) name) (car l))
+   (else (activity-list-find (cdr l) name))))
+
+(define (widget-find widget-list id)
+  (cond
+   ((null? widget-list) #f)
+   ((eqv? (widget-id (car widget-list)) id) (car widget-list))
+   ((equal? (widget-type (car widget-list)) "linear-layout")
+    (let ((ret (widget-find (linear-layout-children (car widget-list)) id)))
+      (if ret ret (widget-find (cdr widget-list) id))))
+   (else (widget-find (cdr widget-list) id))))
+
+(define root 0)
+
+(define (define-activity-list . args)
+  (set! root (activity-list args))
+  (display root)(newline))
+
+
+;; called by java
+(define (activity-callback type activity-name args)
+  (let ((activity (activity-list-find root activity-name)))
+    (if (not activity)
+        (begin (display "no activity called ")(display activity-name)(newline))
+        (let ((ret (cond
+                    ;; todo update activity...?
+                    ((eq? type 'on-create) ((activity-on-create activity) activity))
+                    ((eq? type 'on-start) ((activity-on-create activity) activity))
+                    ((eq? type 'on-stop) ((activity-on-create activity) activity))
+                    ((eq? type 'on-resume) ((activity-on-create activity) activity))
+                    ((eq? type 'on-pause) ((activity-on-create activity) activity))
+                    ((eq? type 'on-destroy) ((activity-on-create activity) activity))
+                    ((eq? type 'on-activity-result) ((activity-on-create activity) activity))
+                    (else
+                     (display "no callback called ")(display type)(newline)
+                     '()))))
+          (send (scheme->json ret))))))
+
+;; called by java
+(define (widget-callback activity-name widget-id args)
+  (let ((activity (activity-list-find root activity-name)))
+    (display "found activity")(newline)
+    (if (not activity)
+        (begin (display "no activity called ")(display activity-name)(newline))
+        (let ((widget (widget-find (list (activity-layout activity)) widget-id)))
+          (display "found widget")(newline)
+          (if (not widget)
+              (begin (display "no widget ")(display widget-id)(display " in ")(display activity-name)(newline))
+              (begin
+                (display "doing stuff")(newline)
+                (display (widget-type widget))(newline)
+                (send (scheme->json
+                       (cond
+                        ((equal? (widget-type widget) "edit-text")
+                         ((edit-text-listener widget) (car args)))
+                        ((equal? (widget-type widget) "button")
+                         ((button-listener widget)))
+                        ((equal? (widget-type widget) "seek-bar")
+                         ((seek-bar-listener widget) (car args)))
+                        ((equal? (widget-type widget) "spinner")
+                         (display "spinner calling")(newline)
+                         ((spinner-listener widget) (car args)))
+                        (else (display "no callbacks for type ")
+                              (display (widget-type widget))(newline))))))))))
+  )

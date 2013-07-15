@@ -83,7 +83,31 @@ public class WidgetBuilder
         }
     }
 
-    public void Build(final Activity ctx, JSONArray arr, ViewGroup parent) {
+    private void Callback(StarwispActivity ctx, int wid)
+    {
+        try {
+            String ret=m_Scheme.eval("(widget-callback \""+
+                                     ctx.m_Name+"\" "+
+                                     wid+" '())");
+            UpdateList(ctx, new JSONArray(ret));
+        } catch (JSONException e) {
+            Log.e("starwisp", "Error parsing data " + e.toString());
+        }
+    }
+
+    private void CallbackArgs(StarwispActivity ctx, int wid, String args)
+    {
+        try {
+            String ret=m_Scheme.eval("(widget-callback \""+
+                                     ctx.m_Name+"\" "+
+                                     wid+" '("+args+"))");
+            UpdateList(ctx, new JSONArray(ret));
+        } catch (JSONException e) {
+            Log.e("starwisp", "Error parsing data " + e.toString());
+        }
+    }
+
+    public void Build(final StarwispActivity ctx, JSONArray arr, ViewGroup parent) {
         try {
             String type = arr.getString(0);
 
@@ -133,12 +157,7 @@ public class WidgetBuilder
                     public boolean onKey(View a, int keyCode, KeyEvent event) {
                         if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                             (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                            try {
-                                String ret=m_Scheme.eval("("+fn+" \""+v.getText()+"\")");
-                                UpdateList(ctx, new JSONArray(ret));
-                            } catch (JSONException e) {
-                                Log.e("starwisp", "Error parsing data " + e.toString());
-                            }
+                            CallbackArgs(ctx,v.getId(),"\""+v.getText()+"\"");
                         }
                         return false;
                     }
@@ -158,12 +177,7 @@ public class WidgetBuilder
                 final String fn = arr.getString(5);
                 v.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        try {
-                            String ret=m_Scheme.eval("("+fn+")");
-                            UpdateList(ctx, new JSONArray(ret));
-                        } catch (JSONException e) {
-                            Log.e("starwisp", "Error parsing data " + e.toString());
-                        }
+                        Callback(ctx,v.getId());
                     }
                 });
                 parent.addView(v);
@@ -178,12 +192,7 @@ public class WidgetBuilder
 
                 v.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     public void onProgressChanged(SeekBar v, int a, boolean s) {
-                        try {
-                            String ret=m_Scheme.eval("("+fn+" "+Integer.toString(a)+")");
-                            UpdateList(ctx, new JSONArray(ret));
-                        } catch (JSONException e) {
-                            Log.e("starwisp", "Error parsing data " + e.toString());
-                        }
+                        CallbackArgs(ctx,v.getId(),Integer.toString(a));
                     }
                     public void onStartTrackingTouch(SeekBar v) {}
                     public void onStopTrackingTouch(SeekBar v) {}
@@ -193,11 +202,11 @@ public class WidgetBuilder
 
             if (type.equals("spinner")) {
                 Spinner v = new Spinner(ctx);
-                v.setId(arr.getInt(1));
+                final int wid = arr.getInt(1);
+                v.setId(wid);
                 final JSONArray items = arr.getJSONArray(2);
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(3)));
                 ArrayList<String> spinnerArray = new ArrayList<String>();
-                final String fn = arr.getString(4);
 
                 for (int i=0; i<items.length(); i++) {
                     spinnerArray.add(items.getString(i));
@@ -208,12 +217,10 @@ public class WidgetBuilder
                                              android.R.layout.simple_spinner_item,
                                              spinnerArray);
                 v.setAdapter(spinnerArrayAdapter);
-
                 v.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     public void onItemSelected(AdapterView<?> a, View v, int pos, long id) {
                         try {
-                            String ret=m_Scheme.eval("("+fn+" \""+items.getString(pos)+"\")");
-                            UpdateList(ctx, new JSONArray(ret));
+                            CallbackArgs(ctx,wid,"\""+items.getString(pos)+"\"");
                         } catch (JSONException e) {
                             Log.e("starwisp", "Error parsing data " + e.toString());
                         }
@@ -256,7 +263,6 @@ public class WidgetBuilder
                 return;
             }
 
-
             // tokens that work on everything
             if (token.equals("hide")) {
                 vv.setVisibility(View.GONE);
@@ -271,16 +277,23 @@ public class WidgetBuilder
                 msg.show();
             }
 
+            if (token.equals("switch-activity")) {
+//                Class actclass = ActivityManager.FindActivity(arr.getString(3));
+//                Intent intent = new Intent(this,actclass);
+//                startActivityForResult(intent, arr.getInt(4));
+            }
+
+
             // special cases
             if (type.equals("text-view")) {
-                TextView v = (TextView)ctx.findViewById(id);
+                TextView v = (TextView)vv;
                 if (token.equals("text")) {
                     v.setText(arr.getString(3));
                 }
             }
 
             if (type.equals("edit-text")) {
-                EditText v = (EditText)ctx.findViewById(id);
+                EditText v = (EditText)vv;
                 if (token.equals("text")) {
                     v.setText(arr.getString(3));
                 }
@@ -288,7 +301,7 @@ public class WidgetBuilder
 
 
             if (type.equals("button")) {
-                Button v = (Button)ctx.findViewById(id);
+                Button v = (Button)vv;
                 if (token.equals("text")) {
                     v.setText(arr.getString(3));
                 }
