@@ -260,6 +260,13 @@
 (define (spinner-layout t) (list-ref t 3))
 (define (spinner-listener t) (list-ref t 4))
 
+(define (canvas id layout drawlist) (list "canvas" id layout drawlist))
+(define (canvas-id t) (list-ref t 1))
+(define (canvas-layout t) (list-ref t 2))
+(define (canvas-drawlist t) (list-ref t 3))
+
+(define (drawlist-line colour width points) (list "line" colour width points))
+
 (define (toast msg) (list "toast" 0 "toast" msg))
 (define (start-activity act request) (list "start-activity" 0 "start-activity" act request))
 (define (finish-activity result) (list "finish-activity" 0 "finish-activity" result))

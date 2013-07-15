@@ -51,8 +51,20 @@
                 (update-widget 'text-view (get-id "view1") 'text "I have been updated"))))
      (seek-bar (make-id "seek") 100 fillwrap
                (lambda (v)
-                 (list (update-widget 'text-view (get-id "view2") 'text (number->string v)))))
-     ))
+                 (list
+                  (update-widget 'text-view (get-id "view2") 'text (number->string v))
+                  (update-widget 'canvas (get-id "canvas") 'drawlist
+                                 (list (drawlist-line '(255 0 0) 10 (list 0 0 v 100))))
+                  )))
+
+     (canvas (make-id "canvas")
+             (layout 200 200 1 'centre)
+             (list
+              (drawlist-line '(255 0 0) 5 '(0 0 100 100))))
+
+     (button (make-id "but4") "one two" 10 fillwrap
+             (lambda ()
+               '()))))
 
    (lambda (activity)
      (activity-layout activity))

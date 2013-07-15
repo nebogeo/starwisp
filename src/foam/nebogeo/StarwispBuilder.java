@@ -66,10 +66,10 @@ public class StarwispBuilder
     }
 
     public int BuildLayoutGravity(String p) {
-//        if (p.equals("centre")) return Gravity.CENTER;
-//        if (p.equals("left")) return Gravity.LEFT;
-//        if (p.equals("right")) return Gravity.RIGHT;
-        return Gravity.RIGHT;
+        if (p.equals("centre")) return Gravity.CENTER;
+        if (p.equals("left")) return Gravity.LEFT;
+        if (p.equals("right")) return Gravity.RIGHT;
+        return Gravity.LEFT;
     }
 
     public int BuildLayoutParam(String p) {
@@ -256,6 +256,16 @@ public class StarwispBuilder
                 parent.addView(v);
             }
 
+            if (type.equals("canvas")) {
+                StarwispCanvas v = new StarwispCanvas(ctx);
+                final int wid = arr.getInt(1);
+                v.setId(wid);
+                v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(2)));
+                v.SetDrawList(arr.getJSONArray(3));
+                parent.addView(v);
+            }
+
+
 
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
@@ -315,7 +325,6 @@ public class StarwispBuilder
             }
 
             // special cases
-
             if (type.equals("image-view")) {
                 ImageView v = (ImageView)vv;
                 if (token.equals("image")) {
@@ -355,6 +364,14 @@ public class StarwispBuilder
                     });
                 }
             }
+
+            if (type.equals("canvas")) {
+                StarwispCanvas v = (StarwispCanvas)vv;
+                if (token.equals("drawlist")) {
+                    v.SetDrawList(arr.getJSONArray(3));
+                }
+            }
+
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }
