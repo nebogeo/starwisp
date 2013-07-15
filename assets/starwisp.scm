@@ -73,7 +73,7 @@
      (spinner (make-id "spinner") (list "one" "two" "three" "cows") fillwrap
               (lambda (v)
                 (list (toast "what's up doc?"))))
-
+     (image-view (make-id "face") "face" wrap)
      (button (make-id "exit") "Exit" 50 fillwrap
              (lambda ()
                (list (finish-activity 99))))))

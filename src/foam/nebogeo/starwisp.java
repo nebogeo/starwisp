@@ -68,7 +68,7 @@ public class starwisp extends StarwispActivity
 
         // build static things
         m_Scheme = new Scheme(this);
-        m_WidgetBuilder = new WidgetBuilder(m_Scheme);
+        m_Builder = new StarwispBuilder(m_Scheme);
         m_Name = "main";
 
         Log.i("starwisp","started, now running starwisp.scm...");

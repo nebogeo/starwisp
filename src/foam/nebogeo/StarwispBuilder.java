@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -50,11 +51,11 @@ import org.json.JSONArray;
 
 
 
-public class WidgetBuilder
+public class StarwispBuilder
 {
     Scheme m_Scheme;
 
-    public WidgetBuilder(Scheme scm) {
+    public StarwispBuilder(Scheme scm) {
         m_Scheme = scm;
     }
 
@@ -140,6 +141,15 @@ public class WidgetBuilder
                     Build(ctx,new JSONArray(children.getString(i)), v);
                 }
                 return;
+            }
+
+            if (type.equals("image-view")) {
+                ImageView v = new ImageView(ctx);
+                int id = ctx.getResources().getIdentifier(arr.getString(2),
+                                                          "drawable", ctx.getPackageName());
+                v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(3)));
+                v.setImageResource(id);
+                parent.addView(v);
             }
 
             if (type.equals("text-view")) {
@@ -305,6 +315,16 @@ public class WidgetBuilder
             }
 
             // special cases
+
+            if (type.equals("image-view")) {
+                ImageView v = (ImageView)vv;
+                if (token.equals("image")) {
+                    int iid = ctx.getResources().getIdentifier(arr.getString(3),
+                                                               "drawable", ctx.getPackageName());
+                    v.setImageResource(iid);
+                }
+            }
+
             if (type.equals("text-view")) {
                 TextView v = (TextView)vv;
                 if (token.equals("text")) {

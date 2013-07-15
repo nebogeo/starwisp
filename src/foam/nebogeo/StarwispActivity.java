@@ -34,7 +34,7 @@ public class StarwispActivity extends Activity
 {
     public String m_Name;
     static public Scheme m_Scheme;
-    static public WidgetBuilder m_WidgetBuilder;
+    static public StarwispBuilder m_Builder;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -48,7 +48,7 @@ public class StarwispActivity extends Activity
         Log.i("starwisp", json);
 
         try {
-            m_WidgetBuilder.Build(this, new JSONArray(json), (ViewGroup) root);
+            m_Builder.Build(this, new JSONArray(json), (ViewGroup) root);
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }
@@ -60,7 +60,7 @@ public class StarwispActivity extends Activity
         super.onStart();
         String ret=m_Scheme.eval("(activity-callback 'on-start \""+m_Name+"\" '())");
         try {
-            m_WidgetBuilder.UpdateList(this, new JSONArray(ret));
+            m_Builder.UpdateList(this, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }
@@ -72,7 +72,7 @@ public class StarwispActivity extends Activity
         super.onResume();
         String ret=m_Scheme.eval("(activity-callback 'on-resume \""+m_Name+"\" '())");
         try {
-            m_WidgetBuilder.UpdateList(this, new JSONArray(ret));
+            m_Builder.UpdateList(this, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }
@@ -85,7 +85,7 @@ public class StarwispActivity extends Activity
         super.onPause();
         String ret=m_Scheme.eval("(activity-callback 'on-pause \""+m_Name+"\" '())");
         try {
-            m_WidgetBuilder.UpdateList(this, new JSONArray(ret));
+            m_Builder.UpdateList(this, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }
@@ -97,7 +97,7 @@ public class StarwispActivity extends Activity
         super.onStop();
         String ret=m_Scheme.eval("(activity-callback 'on-stop \""+m_Name+"\" '())");
         try {
-            m_WidgetBuilder.UpdateList(this, new JSONArray(ret));
+            m_Builder.UpdateList(this, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }
@@ -109,7 +109,7 @@ public class StarwispActivity extends Activity
         super.onDestroy();
         String ret=m_Scheme.eval("(activity-callback 'on-destroy \""+m_Name+"\" '())");
         try {
-            m_WidgetBuilder.UpdateList(this, new JSONArray(ret));
+            m_Builder.UpdateList(this, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }
@@ -118,7 +118,7 @@ public class StarwispActivity extends Activity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         String ret=m_Scheme.eval("(activity-callback 'on-activity-result \""+m_Name+"\" '("+requestCode+" "+resultCode+"))");
         try {
-            m_WidgetBuilder.UpdateList(this, new JSONArray(ret));
+            m_Builder.UpdateList(this, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }

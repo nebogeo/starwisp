@@ -220,6 +220,11 @@
 (define (linear-layout-layout t) (list-ref t 3))
 (define (linear-layout-children t) (list-ref t 4))
 
+(define (image-view id image layout) (list "image-view" id image layout))
+(define (image-view-id t) (list-ref t 1))
+(define (image-view-image t) (list-ref t 2))
+(define (imagge-view-layout t) (list-ref t 3))
+
 (define (text-view id text size layout) (list "text-view" id text size layout))
 (define (text-view-id t) (list-ref t 1))
 (define (text-view-text t) (list-ref t 2))
