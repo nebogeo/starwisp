@@ -44,15 +44,17 @@ class StarwispCanvasThread extends Thread {
                 synchronized (m_SurfaceHolder) {
                     m_Canvas.postInvalidate();
                 }
-                try {
-                    sleep(100);
-                } catch (InterruptedException e) { }
 
             } finally {
                 if (c != null) {
                     m_SurfaceHolder.unlockCanvasAndPost(c);
                 }
             }
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) { }
+
         }
     }
 }
