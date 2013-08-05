@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="bg">#b0b0ff</color>
+  <color name="bg">#000000</color>
 
   <style name="StarwispButton" parent="android:style/Widget.Button">
-    <item name="android:textColor">#ffffff</item>
+    <item name="android:textColor">#000000</item>
     <item name="android:textSize">19sp</item>
-    <item name="android:layout_margin">3dip</item>
-    <item name="android:background">@drawable/button_style</item>
+    <item name="android:background">#ffffff</item>
   </style>
 
   <style name="StarwispSpinnerItem" parent="android:Widget.TextView.SpinnerItem">
@@ -30,10 +29,7 @@
   <style name="StarwispTheme" parent="android:Theme.Light">
     <item name="android:windowBackground">@color/bg</item>
     <item name="android:colorBackground">@color/bg</item>
-    <item name="android:typeface">monospace</item>
     <item name="android:buttonStyle">@style/StarwispButton</item>
-    <item name="android:spinnerStyle">@style/StarwispSpinner</item>
-    <item name="android:spinnerItemStyle">@style/StarwispSpinnerItem</item>
   </style>
 
 

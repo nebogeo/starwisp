@@ -5,7 +5,9 @@
       android:versionName="1.0">
     <application android:label="@string/app_name"
                  android:icon="@drawable/ic_launcher"
-                 android:theme="@style/StarwispTheme">
+                 >
+      <!-- android:theme="@style/StarwispTheme" -->
+
         <activity android:name="starwisp"
                   android:label="@string/app_name">
             <intent-filter>
@@ -13,6 +15,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="TestActivity"></activity>
+        <activity android:name="CalcActivity"></activity>
+        <activity android:name="NewFieldActivity"></activity>
+        <activity android:name="FieldActivity"></activity>
+        <activity android:name="FieldHistoryActivity"></activity>
+        <activity android:name="FieldCalcActivity"></activity>
+        <activity android:name="CameraActivity"></activity>
     </application>
 </manifest>
