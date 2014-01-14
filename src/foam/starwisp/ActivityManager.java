@@ -13,12 +13,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package foam.nebogeo;
+package foam.starwisp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.lang.InstantiationException;
+import java.lang.IllegalAccessException;
 
 import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,21 +29,19 @@ import android.content.Context;
 import android.view.ViewGroup;
 import android.view.View;
 
-public class ActivityManager
-{
+public class ActivityManager {
     static private HashMap<String,Class> m_Activities;
 
     static {
         m_Activities = new HashMap<String,Class>();
     }
 
-    static public void Register(String name, Class actclass)
+    static public void RegisterActivity(String name, Class actclass)
     {
-        Log.i("starwisp","adding "+name+" to activity registry");
         m_Activities.put(name,actclass);
     }
 
-    static public void StartActivity(Activity src, String name, int requestcode)
+    static public void StartActivity(Activity src, String name, int requestcode, String arg)
     {
         Class ActClass = m_Activities.get(name);
         if (ActClass == null)
@@ -50,7 +51,32 @@ public class ActivityManager
         else
         {
             Intent intent = new Intent(src,ActClass);
+            intent.putExtra("arg", arg);
             src.startActivityForResult(intent, requestcode);
         }
     }
+
+    static public void StartActivityGoto(Activity src, String name, String arg)
+    {
+        Class ActClass = m_Activities.get(name);
+        if (ActClass == null)
+        {
+            Log.i("starwisp","activity "+name+" not found in registry");
+        }
+        else
+        {
+            Intent intent = new Intent(src,ActClass);
+            intent.putExtra("arg", arg);
+            src.startActivity(intent);
+        }
+    }
+
+    static public Fragment GetFragment(String name)
+    {
+        StarwispFragment frag = new StarwispFragment();
+        frag.m_Name = name;
+        return frag;
+    }
+
+
 }

@@ -1,25 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="foam.nebogeo"
+      package="foam.starwisp"
       android:versionCode="1"
       android:versionName="1.0">
-    <application android:label="@string/app_name"
-                 android:icon="@drawable/ic_launcher"
-                 >
-      <!-- android:theme="@style/StarwispTheme" -->
-
+    <application android:label="@string/app_name" android:icon="@drawable/ic_launcher">
         <activity android:name="starwisp"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="tv.ouya.intent.category.GAME"/>
             </intent-filter>
         </activity>
-        <activity android:name="CalcActivity"></activity>
-        <activity android:name="NewFieldActivity"></activity>
-        <activity android:name="FieldActivity"></activity>
-        <activity android:name="FieldHistoryActivity"></activity>
-        <activity android:name="FieldCalcActivity"></activity>
-        <activity android:name="CameraActivity"></activity>
     </application>
 </manifest>

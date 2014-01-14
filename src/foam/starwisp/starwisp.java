@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package foam.nebogeo;
+package foam.starwisp;
 
 import java.util.ArrayList;
 
@@ -23,6 +23,7 @@ import android.util.Log;
 import android.content.Context;
 import android.graphics.Color;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -49,21 +50,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-
+import java.util.Calendar;
 
 public class starwisp extends StarwispActivity
 {
     static {
         // register all activities here
-        ActivityManager.Register("main",starwisp.class);
-        ActivityManager.Register("calc",CalcActivity.class);
-        ActivityManager.Register("newfield",NewFieldActivity.class);
-        ActivityManager.Register("field",FieldActivity.class);
-        ActivityManager.Register("fieldhistory",FieldHistoryActivity.class);
-        ActivityManager.Register("fieldcalc",FieldCalcActivity.class);
-        ActivityManager.Register("camera",CameraActivity.class);
+        ActivityManager.RegisterActivity("main",starwisp.class);
     };
-
 
     /** Called when the activity is first created. */
     @Override
@@ -71,13 +65,27 @@ public class starwisp extends StarwispActivity
     {
         setContentView(R.layout.main);
 
+        String dirname = "starwisp/";
+        m_AppDir = "/sdcard/"+dirname;
+        File appdir = new File(m_AppDir);
+        appdir.mkdirs();
+
         // build static things
         m_Scheme = new Scheme(this);
         m_Builder = new StarwispBuilder(m_Scheme);
         m_Name = "main";
 
+        // tell scheme the date
+        final Calendar c = Calendar.getInstance();
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int month = c.get(Calendar.MONTH)+1;
+        int year = c.get(Calendar.YEAR);
+
+        // pass in a bunch of useful stuff
+        m_Scheme.eval("(define dirname \"/sdcard/"+dirname+"\")(define date-day "+day+") (define date-month "+month+") (define date-year "+year+")");
+
         Log.i("starwisp","started, now running starwisp.scm...");
-        m_Scheme.eval(m_Scheme.readRawTextFile(this, "starwisp.scm"));
+        m_Scheme.evalPre(m_Scheme.readRawTextFile(this, "starwisp.scm"));
 
         super.onCreate(savedInstanceState);
     }

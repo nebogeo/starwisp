@@ -13,18 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package foam.nebogeo;
+package foam.starwisp;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.content.Context;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import android.view.ViewGroup;
+import android.util.Log;
 
-public class TestActivity extends StarwispActivity
+public class StarwispWidget
 {
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        m_Name = "two";
-        super.onCreate(savedInstanceState);
-    }
+
+
+
 }

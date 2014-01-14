@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package foam.nebogeo;
+package foam.starwisp;
 
 import android.content.Context;
 import android.view.SurfaceView;
@@ -22,6 +22,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
 import android.util.Log;
+import android.util.DisplayMetrics;
+import android.graphics.Typeface;
 
 import org.json.JSONException;
 import org.json.JSONArray;
@@ -30,10 +32,14 @@ class StarwispCanvas extends SurfaceView implements SurfaceHolder.Callback {
 
     StarwispCanvasThread m_Thread;
     JSONArray m_Drawlist;
+    public Typeface m_Typeface;
+    int m_viewWidth;
+    int m_viewHeight;
 
     public StarwispCanvas(Context context) {
         super(context);
         getHolder().addCallback(this);
+        m_Typeface = ((StarwispActivity)context).m_Typeface;
     }
 
     public void SetDrawList(JSONArray s) { m_Drawlist=s; }
@@ -52,14 +58,37 @@ class StarwispCanvas extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void DrawLine(Canvas canvas, JSONArray prim) {
+    public void DrawLine(Canvas canvas, JSONArray prim, float sx, float sy) {
         try {
             JSONArray v = prim.getJSONArray(3);
-            canvas.drawLine(v.getInt(0),
-                            v.getInt(1),
-                            v.getInt(2),
-                            v.getInt(3),
+            canvas.drawLine(v.getInt(0)*sx,
+                            v.getInt(1)*sy,
+                            v.getInt(2)*sx,
+                            v.getInt(3)*sy,
                             getPaint(canvas,prim));
+        } catch (JSONException e) {
+            Log.e("starwisp", "Error parsing data " + e.toString());
+        }
+    }
+
+    public void DrawText(Canvas canvas, JSONArray prim, float sx, float sy) {
+        try {
+            canvas.save();
+            if (prim.getString(6).equals("vertical"))
+                canvas.rotate(-90,
+                              prim.getInt(2)*sx,
+                              prim.getInt(3)*sy);
+
+            Paint myPaint = new Paint();
+            JSONArray c = prim.getJSONArray(4);
+            myPaint.setColor(Color.rgb(c.getInt(0), c.getInt(1), c.getInt(2)));
+            myPaint.setTextSize(prim.getInt(5));
+            myPaint.setTypeface(m_Typeface);
+            canvas.drawText(prim.getString(1),
+                            prim.getInt(2)*sx,
+                            prim.getInt(3)*sy,
+                            myPaint);
+            canvas.restore();
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
         }
@@ -67,11 +96,22 @@ class StarwispCanvas extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void onDraw(Canvas canvas) {
+        float sx=getWidth()/320.0f;
+        float sy=getHeight()/200.0f;
+
+        Paint myPaint = new Paint();
+        myPaint.setStrokeWidth(0);
+        myPaint.setColor(Color.rgb(127,127,127));
+        canvas.drawRect(0, 0, getWidth(), getHeight(), myPaint);
+
         try {
             for (int i=0; i<m_Drawlist.length(); i++) {
                 JSONArray prim = m_Drawlist.getJSONArray(i);
                 if (prim.getString(0).equals("line")) {
-                    DrawLine(canvas, prim);
+                    DrawLine(canvas, prim, sx, sy);
+                }
+                if (prim.getString(0).equals("text")) {
+                    DrawText(canvas, prim, sx, sy);
                 }
             }
         } catch (JSONException e) {
