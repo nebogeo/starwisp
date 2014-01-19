@@ -482,11 +482,16 @@ int main(int argc, char *argv[])
     appEval((char*)LoadFile("../assets/boot.scm").c_str());
     appEval((char*)LoadFile("../assets/lib.scm").c_str());
     appEval((char*)LoadFile("../assets/compiler.scm").c_str());
+
+    long w=0,h=0;
+    unsigned char *tex=LoadPNG("../assets/raspberrypi.png",w,h);
+    appLoadTexture("raspberrypi.png",w,h,(char *)tex);
+
+
     appEval((char*)string("(pre-process-run '("+LoadFile("../assets/jellyfish.scm")+"))").c_str());
 
 //    appEval((char*)string("(pre-process-run '((setup)))").c_str());
 
-    long w=0,h=0;
     //unsigned char *tex=LoadPNG("material/textures/font.png",w,h);
     //appLoadTexture("font.png",w,h,(char *)tex);
 
@@ -499,8 +504,6 @@ int main(int argc, char *argv[])
 //    unsigned char *tex=LoadPNG("../assets/stripes.png",w,h);
 //    appLoadTexture("stripes.png",w,h,(char *)tex);
 
-    unsigned char *tex=LoadPNG("../assets/raspberrypi.png",w,h);
-    appLoadTexture("raspberrypi.png",w,h,(char *)tex);
 
 
     // setup the repl thread

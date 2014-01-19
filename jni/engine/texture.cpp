@@ -28,7 +28,7 @@ u32 texture_manager::load(const char *name, u32 w, u32 h, u8* data)
     new_node->height=h;
 
     glBindTexture(GL_TEXTURE_2D,new_node->id);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
@@ -42,7 +42,7 @@ u32 texture_manager::find(const char *name)
     texture_node *n=static_cast<texture_node*>(m_textures.m_head);
     while (n!=NULL)
     {
-        if (!strcmp(n->name,name)) 
+        if (!strcmp(n->name,name))
         {
             return n->id;
         }
