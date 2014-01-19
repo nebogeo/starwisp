@@ -170,10 +170,10 @@
 (define (time->seconds t)
    (+ (car t) (/ (cadr t) 1000000)))
 
-(define start-time (time->seconds (time)))
+(define start-time (time->seconds (time-of-day)))
 
 (define (time-now)
-  (- (time->seconds (time)) start-time))
+  (- (time->seconds (time-of-day)) start-time))
 
 ;; just for graph so don't have to be accurate!!!
 (define (date->day d)

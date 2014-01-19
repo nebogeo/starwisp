@@ -1,7 +1,5 @@
 ;; [ Copyright (C) 2011 Dave Griffiths : GPLv2 see LICENCE ]
 
-(display "boot.scm")(newline)
-
 (define frame-thunk '())
 (define flx_time 0)
 (define _touching #f)
@@ -399,8 +397,6 @@
 
 (define rand
   (random-maker 19781116))  ;; another arbitrarily chosen birthday
-
-(display (rand)) (newline)
 
 (define rndf rand)
 

@@ -197,7 +197,7 @@
     _OP_DEF(opexe_6, "db-exec",                        2,  INF_ARG, TST_NONE,                        OP_EXEC_DB          )
     _OP_DEF(opexe_6, "db-insert",                      2,  INF_ARG, TST_NONE,                        OP_INSERT_DB        )
     _OP_DEF(opexe_6, "db-status",                      1,  1,       TST_NONE,                        OP_STATUS_DB        )
-    _OP_DEF(opexe_6, "time",                           0,  0,       TST_NONE,                        OP_TIME             )
+    _OP_DEF(opexe_6, "time-of-day",                    0,  0,       TST_NONE,                        OP_TIME             )
     _OP_DEF(opexe_6, "date-time",                      0,  0,       TST_NONE,                        OP_DATETIME         )
     _OP_DEF(opexe_6, "id-map-add",                     2,  2,       TST_NONE,                        OP_ID_MAP_ADD       )
     _OP_DEF(opexe_6, "id-map-get",                     1,  1,       TST_NONE,                        OP_ID_MAP_GET       )

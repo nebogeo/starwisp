@@ -292,15 +292,6 @@ void DisplayCallback()
   glutSwapBuffers();
 #endif
 
-  static bool first=true;
-  if (first)
-    {
-//      appEval((char*)string("(pre-process-run '("+LoadFile("material/startup.scm")+"))").c_str());
-//        appEval("(setup)");
-        printf("running script\n");
-        first=false;
-    }
-
   pthread_mutex_unlock(render_mutex);
     } else { printf("locked\n"); }
 }
@@ -505,8 +496,12 @@ int main(int argc, char *argv[])
     //tex=LoadPNG("material/textures/squib.png",w,h);
     //appLoadTexture("squib.png",w,h,(char *)tex);
 
-    unsigned char *tex=LoadPNG("../assets/stripes.png",w,h);
-    appLoadTexture("stripes.png",w,h,(char *)tex);
+//    unsigned char *tex=LoadPNG("../assets/stripes.png",w,h);
+//    appLoadTexture("stripes.png",w,h,(char *)tex);
+
+    unsigned char *tex=LoadPNG("../assets/raspberrypi.png",w,h);
+    appLoadTexture("raspberrypi.png",w,h,(char *)tex);
+
 
     // setup the repl thread
 	render_mutex = new pthread_mutex_t;

@@ -75,7 +75,7 @@
    ((eq? name 'code-start) (memseg 0))
    ((eq? name 'code-end) (- (memseg 1) 1))
    ((eq? name 'positions-start) (memseg 1))
-   ((eq? name 'positions-end) (- (memseg 2) 20))
+   ((eq? name 'positions-end) (- (memseg 2) 1))
    ((eq? name 'normals-start) (memseg 2))
    ((eq? name 'normals-end) (- (memseg 3) 1))
    ((eq? name 'colours-start) (memseg 3))
@@ -152,12 +152,48 @@
     (vector sta (variable-address (cadr x)) 0))
    (emit (vector ldl 0 0))))
 
+;; (write! start-addr value value value ...)
 (define (emit-write! x)
   (append
-   (emit-expr (caddr x)) ;; data
-   (emit-expr (cadr x)) ;; address
-   (emit (vector sts 0 0))
-   (emit (vector ldl 0 0))))
+   (cadr
+    (foldl
+     (lambda (val r)
+       (list
+        (+ (car r) 1)
+        (append
+         (cadr r)
+         (emit-expr val)               ;; data
+         (emit (vector ldl (car r) 0)) ;; offset
+         (emit-expr (cadr x))          ;; address
+         (emit (vector add 0 0))       ;; add offset
+         (emit (vector sts 0 0)))))
+     (list 0 '())
+     (cddr x)))
+    (emit (vector ldl 0 0))))
+
+(define (emit-write-add! x)
+  (append
+   (cadr
+    (foldl
+     (lambda (val r)
+       (list
+        (+ (car r) 1)
+        (append
+         (cadr r)
+         (emit-expr (cadr x))          ;; address
+         (emit (vector ldl (car r) 0)) ;; offset
+         (emit (vector add 0 0))       ;; add them
+         (emit (vector lds 0 0))       ;; load value
+         (emit-expr val)               ;; data
+         (emit (vector add 0 0))       ;; add them
+         (emit (vector ldl (car r) 0)) ;; offset
+         (emit-expr (cadr x))          ;; address
+         (emit (vector add 0 0))       ;; add offset
+         (emit (vector sts 0 0)))))
+     (list 0 '())
+     (cddr x)))
+    (emit (vector ldl 0 0))))
+
 
 (define (emit-read x)
   (append
@@ -369,6 +405,7 @@
     ((eq? (car x) '<) (emit-< x))
     ((eq? (car x) 'set!) (emit-set! x))
     ((eq? (car x) 'write!) (emit-write! x))
+    ((eq? (car x) 'write-add!) (emit-write-add! x))
     ((eq? (car x) 'swizzle) (emit-swizzle x))
     ((eq? (car x) 'lambda) (emit-lambda x))
     ((eq? (car x) 'rndvec) (emit (vector rnd 0 0)))
@@ -390,16 +427,6 @@
       (emit (vector 0.5 0.5 0.5))
       (emit (vector add 0 0))
       (emit (vector flr 0 0))))
-    ((eq? (car x) '++)
-     (append
-      (emit-expr (cadr x))
-      (emit-push (vector 1 0 0))
-      (emit (vector add 0 0))))
-    ((eq? (car x) '--)
-     (append
-      (emit-expr (cadr x))
-      (emit-push (vector 1 0 0))
-      (emit (vector sub 0 0))))
     ((eq? (car x) 'synth-create) (emit-synth-create x))
     ((eq? (car x) 'synth-connect) (emit-synth-connect x))
     ((eq? (car x) 'synth-play) (emit-synth-play x))
@@ -526,11 +553,18 @@
         (if (and (list? i) (not (null? i)))
             ;; dispatch to macro processors
             (cond
+             ((eq? (car i) 'forever) (append (list 'loop 1) (pre-process (cdr i))))
+             ((eq? (car i) '++!)
+              (let ((v (pre-process (cadr i))))
+                (dbg (list 'set! v (list '+ v 1)))))
+             ((eq? (car i) '--!)
+              (let ((v (pre-process (cadr i))))
+                (list 'set! v (list '- v 1))))
              ((eq? (car i) 'play-now)
-              (dbg (append
+              (append
                (list 'do)
                (synth-operator 0 0 (cadr i))
-               (list '(synth-play (vector 0 1 0))))))
+               (list '(synth-play (vector 0 1 0)))))
              (else (pre-process i)))
             (pre-process i)))
       s))
