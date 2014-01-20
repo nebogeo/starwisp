@@ -147,7 +147,7 @@ void jellyfish::run()
         // order changes on some compilers :/
         vec3 a=pop();
         vec3 b=pop();
-        push(a-b);
+        push(b-a);
     } break;
 	case MUL:
     {

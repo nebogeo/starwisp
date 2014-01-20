@@ -14,7 +14,7 @@
   (pdata-map! (lambda (n) (vmul (vector (crndf) (crndf) 0) 0.001)) "n")
   (pdata-map! (lambda (c) (vector 1 1 1)) "c")
 
-  (texture 1)
+  (texture (load-texture "stripes.png"))
 
   (translate (vector -1 2 0))
   (rotate (vector -45 0 0))
@@ -99,7 +99,7 @@
          (set! v positions-start)
          (loop (< v positions-end)
                (write! v (+ (* (read (+ v 1024)) anim)
-                            (* (read (+ v 1536)) (- anim 1))))
+                            (* (read (+ v 1536)) (- 1 anim))))
                (set! v (+ v 1)))))
 
      (loop 1
@@ -112,7 +112,7 @@
 
 (define terrain
   '(let ((vertex positions-start)
-         (flingdamp (vector 0 0 0))
+         (flingdamp (vector 5 10 0))
          (world (vector 0 0 0)))
 
      ;; recycle a triangle which is off the screen
@@ -122,11 +122,9 @@
          ;; set z to zero for each vertex
          (write! vertex
                  (+ (*v (read vertex)
-                        (vector 1 1 0)) dir))
-         (write! (+ vertex 1)
+                        (vector 1 1 0)) dir)
                  (+ (*v (read (+ vertex 1))
-                        (vector 1 1 0)) dir))
-         (write! (+ vertex 2)
+                        (vector 1 1 0)) dir)
                  (+ (*v (read (+ vertex 2))
                         (vector 1 1 0)) dir))
 
@@ -138,18 +136,14 @@
                                world) 0.2))))
 
            ;; set the z coordinate for height
-           (write! vertex
-                   (+ (read vertex)
-                      (+ (*v a (vector 0 0 8))
-                         (vector 0 0 -4))))
-           (write! (+ vertex 1)
-                   (+ (read (+ vertex 1))
-                      (+ (*v b (vector 0 0 8))
-                         (vector 0 0 -4))))
-           (write! (+ vertex 2)
-                   (+ (read (+ vertex 2))
-                      (+ (*v c (vector 0 0 8))
-                         (vector 0 0 -4))))
+           (write-add!
+            vertex
+            (+ (*v a (vector 0 0 8))
+               (vector 0 0 -4))
+            (+ (*v b (vector 0 0 8))
+               (vector 0 0 -4))
+            (+ (*v c (vector 0 0 8))
+               (vector 0 0 -4)))
 
            ;; recalculate normals
            (define n (normalise
@@ -159,20 +153,16 @@
                                 (read (+ vertex 1))))))
 
            ;; write to normal data
-           (write! (+ vertex 512) n)
-           (write! (+ vertex 513) n)
-           (write! (+ vertex 514) n)
+           (write! (+ vertex 512) n n n)
 
            ;; write the z height as texture coordinates
            (write! (+ vertex 1536)
-                   (*v (swizzle zzz a) (vector 0 4 0)))
-           (write! (+ vertex 1537)
-                   (*v (swizzle zzz b) (vector 0 4 0)))
-           (write! (+ vertex 1538)
+                   (*v (swizzle zzz a) (vector 0 4 0))
+                   (*v (swizzle zzz b) (vector 0 4 0))
                    (*v (swizzle zzz c) (vector 0 4 0))))))
 
      ;; forever
-     (loop 1
+     (forever
        ;; add inertia to the fling/gamepad joystick input
        (set! flingdamp (+ (* flingdamp 0.99)
                           (*v
@@ -184,12 +174,9 @@
        (set! world (+ world vel))
 
        ;; for each vertex
-       (loop (< vertex positions-end)
-
+       (loop (< vertex (- positions-end 3))
          ;; update the vertex position
-         (write! vertex (+ (read vertex) vel))
-         (write! (+ vertex 1) (+ (read (+ vertex 1)) vel))
-         (write! (+ vertex 2) (+ (read (+ vertex 2)) vel))
+         (write-add! vertex vel vel vel)
 
          ;; check for out of area polygons to recycle
          (cond
@@ -217,11 +204,11 @@
     (msg (pdata-ref "p" c))
     (print-obj (+ c 1)))))
 
-(define (make-jelly-obj speed code)
+(define (make-jelly-obj speed prim-type code)
   (let ((p (build-jellyfish 512)))
     (with-primitive
      p
-     (let ((c (compile-program speed prim-triangles 1 code)))
+     (let ((c (compile-program speed prim-type 1 code)))
       ;; (disassemble c)
        (jelly-compiled c))
      p)))
@@ -245,50 +232,74 @@
 
   (with-primitive
    (make-jelly-obj
-    10000
+    10000 prim-tristrip
    '(let ((vertex positions-start)
            (t 0)
            (v 0)
            (np 0))
-       (forever
-        (set! vertex positions-start)
-        (loop (< vertex positions-end)
-              (set! np (+ (* (+ (read vertex) vertex) 0.1)
-                          (swizzle yyx t)))
-              (set! v (+ (*v (noise np) (vector 1 0 0))
-                         (*v (noise (+ np 101.1)) (vector 0 1 0))))
-              (set! v (*v (- v (vector 0.47 0.47 0.47)) (vector 0.1 0.1 0)))
-              (write-add! vertex v v v v v v)
-              (set! vertex (+ vertex 6)))
-        (set! t (+ t 0.01))
-        )))
+      (forever
+
+       (set! vertex (+ positions-start 1))
+       (loop (< vertex positions-end)
+             (set! v (+ (* (normalise (read vertex)) 0.05)
+                        (* (- (read vertex)
+                              (read (- vertex 1))) -0.5)))
+             (write-add! vertex (+ v (* (rndvec) 0.1)))
+             (set! vertex (+ vertex 1)))
+
+       (set! t (+ t 0.01))
+       )))
    (hint-unlit)
-   (pdata-index-map!
-    (lambda (i p)
-      (let ((z (* i 0.01)))
-        (if (odd? i)
-            (list-ref
-             (list (vector 0 0 z) (vector 1 0 z) (vector 1 1 z))
-             (modulo i 3))
-            (list-ref
-             (list (vector 1 1 z) (vector 0 1 z) (vector 0 0 z))
-             (modulo i 3))))) "p")
-   (texture (load-texture "raspberrypi.png"))
-   (translate (vector -0.5 -0.5 0))
    (pdata-copy "p" "t")
-   (pdata-map! (lambda (t) (vmul t -1)) "t")
-   (pdata-map! (lambda (c) (vector 1 1 1)) "c")
+   (pdata-map! (lambda (p) (vmul (srndvec) 1)) "p")
+   (pdata-map! (lambda (c) (rndvec)) "c")
    (pdata-map! (lambda (n) (vector 0 0 0)) "n"))
 
+  ;(with-primitive
+  ; (make-jelly-obj
+  ;  10000 prim-triangles
+  ; '(let ((vertex positions-start)
+  ;         (t 0)
+  ;         (v 0)
+  ;         (np 0))
+  ;     (forever
+  ;      (set! vertex positions-start)
+  ;      (loop (< vertex positions-end)
+  ;            (set! np (+ (* (+ (read vertex) vertex) 0.1)
+  ;                        (swizzle yyx t)))
+  ;            (set! v (+ (*v (noise np) (vector 1 0 0))
+  ;                       (*v (noise (+ np 101.1)) (vector 0 1 0))))
+  ;            (set! v (*v (- v (vector 0.47 0.47 0.47)) (vector 0.1 0.1 0)))
+  ;            (write-add! vertex v v v v v v)
+  ;            (set! vertex (+ vertex 6)))
+  ;      (set! t (+ t 0.01))
+  ;      )))
+  ; (hint-unlit)
+  ; (pdata-index-map!
+  ;  (lambda (i p)
+  ;    (let ((z (* i 0.01)))
+  ;      (if (odd? i)
+  ;          (list-ref
+  ;           (list (vector 0 0 z) (vector 1 0 z) (vector 1 1 z))
+  ;           (modulo i 3))
+  ;          (list-ref
+  ;           (list (vector 1 1 z) (vector 0 1 z) (vector 0 0 z))
+  ;           (modulo i 3))))) "p")
+  ; (texture (load-texture "raspberrypi.png"))
+  ; (translate (vector -0.5 -0.5 0))
+  ; (pdata-copy "p" "t")
+  ; (pdata-map! (lambda (t) (vmul t -1)) "t")
+  ; (pdata-map! (lambda (c) (vector 1 1 1)) "c")
+  ; (pdata-map! (lambda (n) (vector 0 0 0)) "n"))
 
 
   (set! jelly (build-jellyfish 512))
   (set! jelly2 (build-jellyfish 512))
 
-  ;(with-primitive
-  ; jelly
-  ; (terrain-setup)
-  ; (jelly-compiled (compile-program 10000 prim-triangles 1 terrain)))
+;  (with-primitive
+;   jelly
+;   (terrain-setup)
+;   (jelly-compiled (compile-program 10000 prim-triangles 1 terrain)))
 
   (define s1 (raw-obj (list-ref spider 0)))
   (define s2 (raw-obj (list-ref spider 1)))
