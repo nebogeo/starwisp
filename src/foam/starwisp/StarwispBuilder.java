@@ -46,11 +46,13 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import android.provider.MediaStore;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.ToggleButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
 //import android.widget.GridLayout.Spec;
 import android.widget.ScrollView;
@@ -99,6 +101,8 @@ import android.util.TypedValue;
 import android.os.Handler;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.ExifInterface;
+import android.graphics.Matrix;
 
 import android.content.ClipDescription;
 import android.content.ClipData;
@@ -159,12 +163,18 @@ public class StarwispBuilder
 
     public LinearLayout.LayoutParams BuildLayoutParams(JSONArray arr) {
         try {
-            LinearLayout.LayoutParams lp =
-                new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
-                                              BuildLayoutParam(arr.getString(2)),
-                                              (float)arr.getDouble(3));
+            float weight = (float)arr.getDouble(3);
+            LinearLayout.LayoutParams lp;
+            if (weight == -1) {
+                lp = new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
+                                                   BuildLayoutParam(arr.getString(2)));
+            } else {
+                lp = new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
+                                                   BuildLayoutParam(arr.getString(2)),
+                                                   weight);
+            }
             lp.gravity=BuildLayoutGravity(arr.getString(4));
-            int margin=0;//arr.getInt(5);
+            int margin=arr.getInt(5);
             lp.setMargins(margin,margin,margin,margin);
             return lp;
         } catch (JSONException e) {
@@ -235,12 +245,31 @@ public class StarwispBuilder
         context.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
     }
 
+    public static void photo(StarwispActivity ctx, String path, int code) {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(ctx.getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            photoFile = new File(path);
+
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                           Uri.fromFile(photoFile));
+                ctx.startActivityForResult(takePictureIntent, code);
+            } else {
+                Log.i("starwisp","Could not open photo file");
+            }
+        }
+    }
+
     public void Build(final StarwispActivity ctx, final String ctxname, JSONArray arr, ViewGroup parent) {
 
         try {
             String type = arr.getString(0);
 
-            //Log.i("starwisp","building started "+type);
+            Log.i("starwisp","building started "+type);
 
             if (type.equals("build-fragment")) {
                 String name = arr.getString(1);
@@ -258,6 +287,11 @@ public class StarwispBuilder
 
             if (type.equals("linear-layout")) {
                 StarwispLinearLayout.Build(this,ctx,ctxname,arr,parent);
+                return;
+            }
+
+            if (type.equals("relative-layout")) {
+                StarwispRelativeLayout.Build(this,ctx,ctxname,arr,parent);
                 return;
             }
 
@@ -1024,6 +1058,9 @@ public class StarwispBuilder
                 return;
             }
 
+            if (token.equals("take-photo")) {
+                photo(ctx,arr.getString(3),arr.getInt(4));
+            }
 
             if (token.equals("send-mail")) {
                 final String to[] = new String[1];
@@ -1290,7 +1327,28 @@ public class StarwispBuilder
                 }
                 if (token.equals("external-image")) {
                     Bitmap bitmap = BitmapFactory.decodeFile(arr.getString(3));
-                    v.setImageBitmap(bitmap);
+                    // do the rotation here, so the photo shows the right way round
+                    try {
+                        ExifInterface exif = new ExifInterface(arr.getString(3));
+                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                        Matrix matrix = new Matrix();
+                        matrix.postRotate(0);
+
+                        if (orientation == 6) {
+                            matrix.postRotate(90);
+                        }
+                        else if (orientation == 3) {
+                            matrix.postRotate(180);
+                        }
+                        else if (orientation == 8) {
+                            matrix.postRotate(270);
+                        }
+
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                        v.setImageBitmap(bitmap);
+                    }
+                    catch (IOException e) {
+                    }
                 }
                 return;
             }

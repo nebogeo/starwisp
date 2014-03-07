@@ -12,5 +12,6 @@
                 <category android:name="tv.ouya.intent.category.GAME"/>
             </intent-filter>
         </activity>
+        <activity android:name="VillageActivity" android:configChanges="orientation"></activity>
     </application>
 </manifest>

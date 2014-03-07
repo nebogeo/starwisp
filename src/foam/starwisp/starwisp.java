@@ -85,7 +85,7 @@ public class starwisp extends StarwispActivity
         m_Scheme.eval("(define dirname \"/sdcard/"+dirname+"\")(define date-day "+day+") (define date-month "+month+") (define date-year "+year+")");
 
         Log.i("starwisp","started, now running starwisp.scm...");
-        m_Scheme.evalPre(m_Scheme.readRawTextFile(this, "starwisp.scm"));
+        m_Scheme.eval(m_Scheme.readRawTextFile(this, "starwisp.scm"));
 
         super.onCreate(savedInstanceState);
     }

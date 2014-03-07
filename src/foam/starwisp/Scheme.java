@@ -56,12 +56,13 @@ public class Scheme
         eval(readRawTextFile(ctx, "init.scm"));
         eval(readRawTextFile(ctx, "lib.scm"));
         eval(readRawTextFile(ctx, "eavdb.scm"));
-        Log.i("starwisp","running jellyfish.scm...");
-        eval(readRawTextFile(ctx, "jellyfish.scm"));
-        Log.i("starwisp","running boot.scm...");
-        eval(readRawTextFile(ctx, "boot.scm"));
-        Log.i("starwisp","running compiler.scm...");
-        eval(readRawTextFile(ctx, "compiler.scm"));
+        eval(readRawTextFile(ctx, "dbsync.scm"));
+        //       Log.i("starwisp","running jellyfish.scm...");
+        //eval(readRawTextFile(ctx, "jellyfish.scm"));
+        //Log.i("starwisp","running boot.scm...");
+        //eval(readRawTextFile(ctx, "boot.scm"));
+        //Log.i("starwisp","running compiler.scm...");
+        //eval(readRawTextFile(ctx, "compiler.scm"));
         Log.i("starwisp","done.");
 
         ret = new FlxImage();
@@ -140,9 +141,9 @@ public class Scheme
         //Log.i("starwisp","eval on");
         synchronized (mLock)
         {
+            //Log.i("starwisp",code);
             String ret=nativeEval(code);
-            //Log.i("starwisp","eval done: "+ret.length());
-            //Log.i("starwisp",ret);
+            Log.i("starwisp",ret);
             return ret;
         }
     }

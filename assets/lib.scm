@@ -417,6 +417,8 @@
 (define (layout-gravity l) (list-ref l 4))
 (define (layout-margin l) (list-ref l 5))
 
+(define (relative-layout width height margin rules) (list "relative-layout" width height margin rules))
+
 (define centre-layout (layout 'wrap-content 'wrap-content 1 'centre 0))
 
 (define (widget-type w) (list-ref w 0))
@@ -426,6 +428,9 @@
 (define (linear-layout id orientation layout colour children)
   (list "linear-layout" id orientation layout colour children))
 (define (linear-layout-children t) (list-ref t 5))
+(define (relative-layout id layout colour children)
+  (list "relative-layout" id layout colour children))
+(define (relative-layout-children t) (list-ref t 4))
 (define (frame-layout id layout children)
   (list "frame-layout" id layout children))
 (define (frame-layout-children t) (list-ref t 3))
@@ -674,6 +679,7 @@
 (define (widget-get-children w)
   (cond
    ((equal? (widget-type w) "linear-layout") (linear-layout-children w))
+   ((equal? (widget-type w) "relative-layout") (relative-layout-children w))
    ((equal? (widget-type w) "frame-layout") (frame-layout-children w))
    ((equal? (widget-type w) "scroll-view") (scroll-view-children w))
 ;;   ((equal? (widget-type w) "grid-layout") (grid-layout-children w))
