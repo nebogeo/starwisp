@@ -1048,6 +1048,17 @@ public class StarwispBuilder
                 return;
             }
 
+            if (token.equals("http-upload")) {
+                if (m_NetworkManager.state==NetworkManager.State.CONNECTED) {
+                    Log.i("starwisp","attempting http ul request");
+                    final String filename = arr.getString(4);
+                    final String url = arr.getString(5);
+                    m_NetworkManager.StartRequestThread(url,"upload",filename);
+                }
+                return;
+            }
+
+
             if (token.equals("http-download")) {
                 if (m_NetworkManager.state==NetworkManager.State.CONNECTED) {
                     Log.i("starwisp","attempting http dl request");
