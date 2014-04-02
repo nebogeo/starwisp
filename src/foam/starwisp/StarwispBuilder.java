@@ -513,8 +513,7 @@ public class StarwispBuilder
                 String image = arr.getString(2);
 
                 if (image.startsWith("/")) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(image);
-                    v.setImageBitmap(bitmap);
+                    v.setImageBitmap(BitmapCache.Load(image));
                 } else {
                     int id = ctx.getResources().getIdentifier(image,"drawable", ctx.getPackageName());
                     v.setImageResource(id);
@@ -1337,29 +1336,7 @@ public class StarwispBuilder
                     v.setImageResource(iid);
                 }
                 if (token.equals("external-image")) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(arr.getString(3));
-                    // do the rotation here, so the photo shows the right way round
-                    try {
-                        ExifInterface exif = new ExifInterface(arr.getString(3));
-                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-                        Matrix matrix = new Matrix();
-                        matrix.postRotate(0);
-
-                        if (orientation == 6) {
-                            matrix.postRotate(90);
-                        }
-                        else if (orientation == 3) {
-                            matrix.postRotate(180);
-                        }
-                        else if (orientation == 8) {
-                            matrix.postRotate(270);
-                        }
-
-                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                        v.setImageBitmap(bitmap);
-                    }
-                    catch (IOException e) {
-                    }
+                    v.setImageBitmap(BitmapCache.Load(arr.getString(3)));
                 }
                 return;
             }
