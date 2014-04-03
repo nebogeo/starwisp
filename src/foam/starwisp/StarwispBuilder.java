@@ -50,6 +50,7 @@ import android.provider.MediaStore;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ToggleButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -521,6 +522,34 @@ public class StarwispBuilder
 
                 parent.addView(v);
             }
+
+            if (type.equals("image-button")) {
+                ImageButton v = new ImageButton(ctx);
+                v.setId(arr.getInt(1));
+                v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(3)));
+
+                String image = arr.getString(2);
+
+                if (image.startsWith("/")) {
+                    v.setImageBitmap(BitmapCache.Load(image));
+                } else {
+                    int id = ctx.getResources().getIdentifier(image,"drawable", ctx.getPackageName());
+                    v.setImageResource(id);
+                }
+
+                final String fn = arr.getString(4);
+                v.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        Callback(ctx,ctxname,v.getId());
+                    }
+                });
+
+                v.setAdjustViewBounds(true);
+                v.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+
+                parent.addView(v);
+            }
+
 
             if (type.equals("text-view")) {
                 TextView v = new TextView(ctx);
