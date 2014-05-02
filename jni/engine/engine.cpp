@@ -19,12 +19,14 @@
 #include "jellyfish/jellyfish_primitive.h"
 #include "fluxa/Graph.h"
 #include "obj_reader.h"
+#include "core/msg.h"
 
 #ifdef _EE
 #include "ee/ps2-renderer.h"
 #endif
 
 engine *engine::m_engine=NULL;
+#define CAMERA_ID -999;
 
 engine::state_stack_item::state_stack_item()
 {
@@ -49,6 +51,7 @@ engine::state_stack_item::state_stack_item(const state_stack_item &other)
 
 engine::engine()
 {
+    m_camera_lock = -1;
     m_sg=new scenegraph();
     clear();
     m_audio_graph = new Graph(70,16000);
@@ -119,6 +122,12 @@ int engine::grabbed_id()
         (m_grab_stack.m_head)->m_id;
 }
 
+bool engine::grabbed_camera()
+{
+    return m_grab_stack.m_head!=NULL &&
+        grabbed_id()==CAMERA_ID;
+}
+
 scenenode *engine::grabbed_node()
 {
     scenenode *n=m_sg->find(grabbed_id());
@@ -129,50 +138,55 @@ scenenode *engine::grabbed_node()
     return n;
 }
 
+void engine::lock_camera(int id)
+{
+    m_camera_lock=id;
+}
+
+
 void engine::identity()
 {
-    if (grabbed())
-    {
-        grabbed_node()->m_tx.init();
+    if (grabbed_camera()) {
+        m_camera_tx.init();
     }
-    else
-    {
+    else if (grabbed()) {
+        grabbed_node()->m_tx.init();
+    } else {
         state_top()->m_tx.init();
     }
 }
 
 void engine::translate(float x, float y, float z)
 {
-    if (grabbed())
-    {
+    if (grabbed_camera()) {
+        m_camera_tx.translate(x,y,z);
+    }
+    else if (grabbed()) {
         grabbed_node()->m_tx.translate(x,y,z);
     }
-    else
-    {
+    else {
         state_top()->m_tx.translate(x,y,z);
     }
 }
 
 void engine::scale(float x, float y, float z)
 {
-    if (grabbed())
-    {
+    if (grabbed_camera()) {
+        m_camera_tx.scale(x,y,z);
+    } else if (grabbed()) {
         grabbed_node()->m_tx.scale(x,y,z);
-    }
-    else
-    {
+    } else {
         state_top()->m_tx.scale(x,y,z);
     }
 }
 
 void engine::rotate(float x, float y, float z)
 {
-    if (grabbed())
-    {
+    if (grabbed_camera()) {
+        m_camera_tx.rotxyz(x,y,z);
+    } else if (grabbed()) {
         grabbed_node()->m_tx.rotxyz(x,y,z);
-    }
-    else
-    {
+    } else {
         state_top()->m_tx.rotxyz(x,y,z);
     }
 }
@@ -532,7 +546,17 @@ void engine::render()
     buf[0]=0.0f; buf[1]=0.0f; buf[2]=0.0f;  buf[3]=1.1f;
     glLightxv(GL_LIGHT0, GL_POSITION, (GLfixed *)buf);
 
-   glMultMatrixx((GLfixed*)&m_camera_tx.m[0][0]);
+    glMultMatrixx((GLfixed*)&m_camera_tx.m[0][0]);
+
+    if (m_camera_lock!=-1) {
+        scenenode *n=m_sg->find(m_camera_lock);
+        if (n!=NULL)
+        {
+            glMultMatrixx((GLfixed*)&n->m_tx.inverse().m[0][0]);
+        }
+    }
+
+
 //    glMultMatrixf(&m_camera_tx.m[0][0]);
 #endif
     m_sg->render();

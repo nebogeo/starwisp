@@ -514,7 +514,10 @@ public class StarwispBuilder
                 String image = arr.getString(2);
 
                 if (image.startsWith("/")) {
-                    v.setImageBitmap(BitmapCache.Load(image));
+                    Bitmap b=BitmapCache.Load(image);
+                    if (b!=null) {
+                        v.setImageBitmap(b);
+                    }
                 } else {
                     int id = ctx.getResources().getIdentifier(image,"drawable", ctx.getPackageName());
                     v.setImageResource(id);
@@ -755,11 +758,7 @@ public class StarwispBuilder
                 v.setAdapter(spinnerArrayAdapter);
                 v.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     public void onItemSelected(AdapterView<?> a, View v, int pos, long id) {
-                        try {
-                            CallbackArgs(ctx,ctxname,wid,"\""+items.getString(pos)+"\"");
-                        } catch (JSONException e) {
-                            Log.e("starwisp", "Error parsing data " + e.toString());
-                        }
+                        CallbackArgs(ctx,ctxname,wid,""+pos);
                     }
                     public void onNothingSelected(AdapterView<?> v) {}
                 });
@@ -1179,6 +1178,11 @@ public class StarwispBuilder
 
 ///////////////////////////////////////////////////////////
 
+            if (id == 0) {
+                Log.i("starwisp", "Zero ID, aborting...");
+                return;
+            }
+
             // now try and find the widget
             View vv=ctx.findViewById(id);
             if (vv==null)
@@ -1502,7 +1506,7 @@ public class StarwispBuilder
 
                     ArrayAdapter spinnerArrayAdapter =
                         new ArrayAdapter<String>(ctx,
-                                                 android.R.layout.simple_spinner_item,
+                                                 R.layout.spinner_item,
                                                  spinnerArray) {
                         public View getView(int position, View convertView,ViewGroup parent) {
                             View v = super.getView(position, convertView, parent);
@@ -1511,17 +1515,14 @@ public class StarwispBuilder
                         }
                     };
 
+                    spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_layout);
                     v.setAdapter(spinnerArrayAdapter);
 
                     final int wid = id;
                     // need to update for new values
                     v.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         public void onItemSelected(AdapterView<?> a, View v, int pos, long id) {
-                            try {
-                                CallbackArgs(ctx,ctxname,wid,"\""+items.getString(pos)+"\"");
-                            } catch (JSONException e) {
-                                Log.e("starwisp", "Error parsing data " + e.toString());
-                            }
+                            CallbackArgs(ctx,ctxname,wid,""+pos);
                         }
                         public void onNothingSelected(AdapterView<?> v) {}
                     });

@@ -41,35 +41,36 @@ public class BitmapCache
         else
         {
             Bitmap bitmap = BitmapFactory.decodeFile(Filename);
-            // do the rotation here, so the photo shows the right way round
-            try {
-                ExifInterface exif = new ExifInterface(Filename);
-                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-                Matrix matrix = new Matrix();
-                matrix.postRotate(0);
+            if (bitmap!=null) {
+                // do the rotation here, so the photo shows the right way round
+                try {
+                    ExifInterface exif = new ExifInterface(Filename);
+                    int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(0);
 
-                if (orientation == 6) {
-                    matrix.postRotate(90);
+                    if (orientation == 6) {
+                        matrix.postRotate(90);
+                    }
+                    else if (orientation == 3) {
+                        matrix.postRotate(180);
+                    }
+                    else if (orientation == 8) {
+                        matrix.postRotate(270);
+                    }
+
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 480, 640, false);
+
+                    m_Cache.put(Filename,bitmap);
+                    return bitmap;
                 }
-                else if (orientation == 3) {
-                    matrix.postRotate(180);
+                catch (IOException e) {
                 }
-                else if (orientation == 8) {
-                    matrix.postRotate(270);
-                }
-
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                bitmap = Bitmap.createScaledBitmap(bitmap, 480, 640, false);
-
-                m_Cache.put(Filename,bitmap);
-                return bitmap;
-
+                return null;
             }
-            catch (IOException e) {
-            }
-
+            return null;
         }
-        return null;
     }
 
 }

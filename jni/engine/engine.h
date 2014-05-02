@@ -37,6 +37,7 @@ public:
     void pop();
     void grab(int id);
     void ungrab();
+    void lock_camera(int id);
 
     void identity();
     void translate(float x, float y, float z);
@@ -94,6 +95,7 @@ private:
 
     list m_state_stack;
     list m_grab_stack;
+    int m_camera_lock;
 
     class state_stack_item : public list::node
     {
@@ -118,6 +120,7 @@ private:
     state_stack_item *state_top();
     bool grabbed();
     int grabbed_id();
+    bool grabbed_camera();
     scenenode *grabbed_node();
     void setup_state(scenenode *n);
 
