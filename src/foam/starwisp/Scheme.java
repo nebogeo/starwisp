@@ -53,22 +53,6 @@ public class Scheme
         Log.i("starwisp","starting up...");
         nativeInit();
         eval(readRawTextFile(ctx, "init.scm"));
-
-/*        Log.i("starwisp","started, now running init.scm...");
-        eval(readRawTextFile(ctx, "lib.scm"));
-        eval(readRawTextFile(ctx, "eavdb.scm"));
-        eval(readRawTextFile(ctx, "dbsync.scm"));
-
-        Log.i("starwisp","running jellyfish.scm...");
-        eval(readRawTextFile(ctx, "models.scm"));
-
-        Log.i("starwisp","running boot.scm...");
-        eval(readRawTextFile(ctx, "boot.scm"));
-        Log.i("starwisp","running compiler.scm...");
-        eval(readRawTextFile(ctx, "compiler.scm"));
-
-        Log.i("starwisp","done.");
-*/
         ret = new FlxImage();
     }
 
@@ -83,7 +67,7 @@ public class Scheme
             createEngine();
 
             Log.i("starwisp","loading textures");
-            loadTexture("stripes.png");
+            loadTexture("peice.png");
             loadTexture("board.png");
             Log.i("starwisp","done.");
         }

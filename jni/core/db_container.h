@@ -24,6 +24,20 @@ public:
         m_dbs.add_to_end(new db_node(fn,d));
     }
 
+    void remove(const char *fn)
+    {
+        db_node *cur=(db_node*)m_dbs.m_head;
+        while (cur!=NULL)
+        {
+            if (!strcmp(fn,cur->m_fn))
+            {
+                m_dbs.remove(cur);
+                return;
+            }
+            cur=(db_node*)cur->m_next;
+        }
+    }
+
     db *get(const char *fn)
     {
         db_node *cur=(db_node*)m_dbs.m_head;

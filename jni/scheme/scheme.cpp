@@ -32,6 +32,7 @@
 #include <ctype.h>
 #include <sys/time.h>
 #include <time.h>
+#include <dirent.h>
 
 ///// starwisp stuff //////////////////////////
 
@@ -4295,6 +4296,13 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
           }
           s_return(sc,sc->F);
      }
+     case OP_CLOSE_DB: {
+          if (is_string(car(sc->args))) {
+               the_db_container.remove(string_value(car(sc->args)));
+               s_return(sc,sc->T);
+          }
+          s_return(sc,sc->F);
+     }
      case OP_EXEC_DB: {
           if (is_string(car(sc->args)) &&
               is_string(cadr(sc->args))) {
@@ -4323,6 +4331,22 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                s_return(sc,mk_string(sc,the_db_container.status()));
           }
           s_return(sc,sc->F);
+     }
+     case OP_DIR_LIST: {
+          pointer ret = sc->NIL;
+
+          if (is_string(car(sc->args))) {
+               DIR *dir;
+               struct dirent *ent;
+               if ((dir = opendir(string_value(car(sc->args))))!=NULL) {
+                    while ((ent = readdir (dir)) != NULL) {
+                         ret = cons(sc,mk_string(sc,ent->d_name),ret);
+                    }
+                    closedir (dir);
+               }
+          }
+          s_return(sc,ret);
+
      }
      case OP_TIME: {
           	timeval t;
@@ -5196,12 +5220,13 @@ static void dump_stack_print(scheme *sc, char *str)
           snprintf(str,STRBUFFSIZE,"stack empty\n");
      }
 
+     putstr(sc, "======= stack follows ======\n");
+
      while (nframes>=0) {
           frame = (struct dump_stack_frame *)sc->dump_base + nframes;
           op_code_info *pcd=dispatch_table+frame->op;
 
-          snprintf(str,STRBUFFSIZE,"-------- frame %d %s %s -------",
-                   nframes,pcd->name,procname(frame->args));
+          snprintf(str,STRBUFFSIZE,"-------- frame %d -------", nframes);
           putstr(sc, str);
           putstr(sc, "\n");
 

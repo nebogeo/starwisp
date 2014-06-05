@@ -121,6 +121,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+import java.io.ByteArrayOutputStream;
+
 public class StarwispBuilder
 {
     Scheme m_Scheme;
@@ -128,11 +130,17 @@ public class StarwispBuilder
 	LocationManager m_LocationManager;
     DorisLocationListener m_GPS;
     Handler m_Handler;
+    SoundManager m_SoundManager;
+
+    // resize all camera images to this resolution
+    static int PHOTO_WIDTH=640;
+    static int PHOTO_HEIGHT=480;
 
     public StarwispBuilder(Scheme scm) {
         m_Scheme = scm;
         m_NetworkManager = new NetworkManager();
         m_Handler = new Handler();
+        m_SoundManager = new SoundManager();
     }
 
     public int BuildOrientation(String p) {
@@ -510,6 +518,7 @@ public class StarwispBuilder
                 ImageView v = new ImageView(ctx);
                 v.setId(arr.getInt(1));
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(3)));
+                v.setAdjustViewBounds(true);
 
                 String image = arr.getString(2);
 
@@ -894,6 +903,12 @@ public class StarwispBuilder
             // non widget commands
             if (token.equals("toast")) {
                 Toast msg = Toast.makeText(ctx.getBaseContext(),arr.getString(3),Toast.LENGTH_SHORT);
+
+                LinearLayout linearLayout = (LinearLayout) msg.getView();
+                View child = linearLayout.getChildAt(0);
+                TextView messageTextView = (TextView) child;
+                messageTextView.setTextSize(30);
+
                 msg.show();
                 return;
             }
@@ -910,6 +925,23 @@ public class StarwispBuilder
                     mp.start();
                 }
             }
+
+            if (token.equals("soundfile-start-recording")) {
+                String filename = arr.getString(3);
+                m_SoundManager.StartRecording(filename);
+            }
+            if (token.equals("soundfile-stop-recording")) {
+                m_SoundManager.StopRecording();
+            }
+            if (token.equals("soundfile-start-playback")) {
+                String filename = arr.getString(3);
+                m_SoundManager.StartPlaying(filename);
+            }
+            if (token.equals("soundfile-stop-playback")) {
+                m_SoundManager.StopPlaying();
+            }
+
+
 
             if (token.equals("vibrate")) {
                 Vibrator v = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
@@ -1457,10 +1489,15 @@ public class StarwispBuilder
 
                     v.TakePicture(
                         new PictureCallback() {
-                            public void onPictureTaken(byte[] data, Camera camera) {
+                            public void onPictureTaken(byte[] input, Camera camera) {
+                                Bitmap original = BitmapFactory.decodeByteArray(input, 0, input.length);
+                                Bitmap resized = Bitmap.createScaledBitmap(original, PHOTO_WIDTH, PHOTO_HEIGHT, true);
+                                ByteArrayOutputStream blob = new ByteArrayOutputStream();
+                                resized.compress(Bitmap.CompressFormat.JPEG, 100, blob);
+
                                 String datetime = getDateTime();
                                 String filename = path+datetime + ".jpg";
-                                SaveData(filename,data);
+                                SaveData(filename,blob.toByteArray());
                                 v.Shutdown();
                                 ctx.finish();
                             }
