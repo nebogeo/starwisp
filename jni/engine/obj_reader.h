@@ -2,8 +2,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
-
 class obj_reader
 {
 public:
@@ -31,18 +29,18 @@ public:
 
 	struct Face
 	{
-        vector<Indices> Index;
+        std::vector<Indices> Index;
 	};
 
-    void FormatRead(const string &filename);
+    void FormatRead(const std::string &filename);
     void RawRead(char *data);
-	unsigned int TokeniseLine(unsigned int pos, vector<std::string> &output);
-	void TokeniseIndices(const string &str, std::vector<std::string> &output);
+	unsigned int TokeniseLine(unsigned int pos, std::vector<std::string> &output);
+	void TokeniseIndices(const std::string &str, std::vector<std::string> &output);
 	void ReadOBJ(std::vector<vec3> &positions,
 				std::vector<vec3> &textures,
 				std::vector<vec3> &normals,
 				std::vector<Face> &faces);
-	vector<Indices> RemoveDuplicateIndices();
+    std::vector<Indices> RemoveDuplicateIndices();
 	void ReorderData(const std::vector<Indices> &unique);
 	void UnifyIndices(const std::vector<Indices> &unique);
 

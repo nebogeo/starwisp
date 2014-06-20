@@ -31,7 +31,7 @@
 #include <GLES/gl.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-#else 
+#else
 
 
 #ifdef FLX_LINUX
@@ -63,7 +63,7 @@ void glLightxv( GLenum light, GLenum pname, GLfixed * params);
 void glMultMatrixx( GLfixed * mat );
 
 #include <iostream>
-using namespace std;
+
 
 #else
 
@@ -77,7 +77,7 @@ extern "C" {
 #ifndef ANDROID_NDK
 #include <GLES/egl.h>
 #endif /* !ANDROID_NDK */
-   
+
 /* Use DISABLE_IMPORTGL if you want to link the OpenGL ES at
  * compile/link time and not import it dynamically runtime.
  */
@@ -217,4 +217,3 @@ FNDEF(void, glViewport, (GLint x, GLint y, GLsizei width, GLsizei height));
 #endif // _EE
 
 #endif // !IMPORTGL_H_INCLUDED
-

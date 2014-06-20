@@ -18,8 +18,6 @@
 #include "core/list.h"
 #include <string.h>
 
-using namespace std;
-
 class db
 {
 public:

@@ -17,8 +17,6 @@
 #ifndef ALLOCATOR
 #define ALLOCATOR
 
-using namespace std;
-
 class Allocator
 {
 public:
@@ -38,7 +36,7 @@ public:
 
 	virtual char *New(unsigned int size);
 	virtual void Delete(char *mem);
-	
+
 protected:
 };
 
@@ -49,14 +47,14 @@ class RealtimeAllocator : public Allocator
 public:
 	RealtimeAllocator(unsigned int size);
 	virtual ~RealtimeAllocator() {}
-	
+
 	virtual void Reset();
 	virtual char *New(unsigned int size);
 	virtual void Delete(char *mem);
 
 protected:
-	
-	char *m_Buffer;	
+
+	char *m_Buffer;
 	unsigned int m_Position;
 	unsigned int m_Size;
 };

@@ -104,6 +104,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.graphics.Matrix;
+import android.graphics.LightingColorFilter;
 
 import android.content.ClipDescription;
 import android.content.ClipData;
@@ -307,7 +308,7 @@ public class StarwispBuilder
             if (type.equals("draggable")) {
                 final LinearLayout v = new LinearLayout(ctx);
                 final int id=arr.getInt(1);
-                v.setPadding(20,20,20,20);
+                v.setPadding(10,0,40,0);
                 v.setId(id);
                 v.setOrientation(BuildOrientation(arr.getString(2)));
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(3)));
@@ -330,10 +331,13 @@ public class StarwispBuilder
 
                 // Sets a long click listener for the ImageView using an anonymous listener object that
                 // implements the OnLongClickListener interface
-/*                v.setOnLongClickListener(new View.OnLongClickListener() {
+                v.setOnLongClickListener(new View.OnLongClickListener() {
                     public boolean onLongClick(View vv) {
                         if (id!=99) {
-                            ClipData dragData = ClipData.newPlainText("simple text", ""+id);
+                            ClipData dragData = new ClipData(
+                                new ClipDescription(null,new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }),
+                                new ClipData.Item(""+id));
+
                             View.DragShadowBuilder myShadow = new MyDragShadowBuilder(v);
                             Log.i("starwisp","start drag id "+vv.getId());
                             v.startDrag(dragData, myShadow, null, 0);
@@ -343,10 +347,10 @@ public class StarwispBuilder
                         return false;
                     }
                 });
-*/
+
                 // Sets a long click listener for the ImageView using an anonymous listener object that
                 // implements the OnLongClickListener interface
-                v.setOnTouchListener(new View.OnTouchListener() {
+/*                v.setOnTouchListener(new View.OnTouchListener() {
                     public boolean onTouch(View vv, MotionEvent event) {
                         if (event.getAction()==MotionEvent.ACTION_DOWN && id!=99) {
 //                            ClipData dragData = ClipData.newPlainText("simple text", ""+id);
@@ -364,7 +368,7 @@ public class StarwispBuilder
                         return false;
                     }
                 });
-
+*/
 
 
 
@@ -1098,6 +1102,7 @@ public class StarwispBuilder
             }
 
             if (token.equals("http-request")) {
+                Log.i("starwisp","http-request called");
                 if (m_NetworkManager.state==NetworkManager.State.CONNECTED) {
                     Log.i("starwisp","attempting http request");
                     final String name = arr.getString(3);
@@ -1236,9 +1241,19 @@ public class StarwispBuilder
 
             // tokens that work on everything
             if (token.equals("set-enabled")) {
+                Log.i("starwisp","set-enabled called...");
                 vv.setEnabled(arr.getInt(3)==1);
+                vv.setClickable(arr.getInt(3)==1);
+                vv.setBackgroundColor(0x00000000);
                 return;
             }
+
+            if (token.equals("background-colour")) {
+                JSONArray col = arr.getJSONArray(3);
+                //vv.setBackgroundColor();
+                vv.getBackground().setColorFilter(new LightingColorFilter(0xFF00FFFF, Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2))));
+            }
+
 
 
             // special cases
@@ -1261,6 +1276,7 @@ public class StarwispBuilder
 
             if (type.equals("button-grid")) {
                 LinearLayout horiz = (LinearLayout)vv;
+
                 if (token.equals("grid-buttons")) {
                     horiz.removeAllViews();
 

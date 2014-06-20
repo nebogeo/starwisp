@@ -50,6 +50,10 @@ db_container the_db_container;
 #include "core/idmap.h"
 idmap the_idmap;
 
+#include "../fluxa/Graph.h"
+
+Graph *m_audio_graph;
+
 #ifdef _EE
 #define USE_STRLWR 0
 #define USE_STRCASECMP 0
@@ -4156,7 +4160,7 @@ static pointer opexe_5(scheme *sc, enum scheme_opcodes op) {
 }
 
 // fudge to behave like planet jaymccarthy/sqlite:5:1/sqlite
-static pointer db_data_to_scm(scheme *sc, list *data)
+static pointer db_data_to_scm(scheme *sc, bb::list *data)
 {
      if (data!=NULL)
      {
@@ -4218,7 +4222,7 @@ pointer db_exec(scheme* sc, db *d) {
           c++;
      }
 
-     list *data=d->run(stmt);
+     bb::list *data=d->run(stmt);
      pointer ret=db_data_to_scm(sc,data);
      delete data;
      return ret;
@@ -4574,7 +4578,7 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
          vec3 evec(rvalue(vector_elem(cadr(sc->args),0)),
                    rvalue(vector_elem(cadr(sc->args),1)),
                    rvalue(vector_elem(cadr(sc->args),2)));
-         list *points=engine::get()->geo_line_intersect(svec,evec);
+         bb::list *points=engine::get()->geo_line_intersect(svec,evec);
          if (points!=NULL)
          {
               pointer list=sc->NIL;
@@ -4639,6 +4643,34 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                                  ivalue(cadr(sc->args))|
                                  ivalue(caddr(sc->args))
                         ));
+     }
+/////////////////////////////////////////////////////////
+     case OP_FLUXA_INIT:
+     {
+          m_audio_graph = new Graph(ivalue(car(sc->args)),
+                                    ivalue(cadr(sc->args)));
+          s_return(sc,sc->NIL);
+     }
+     case OP_FLUXA_CREATE:
+     {
+          m_audio_graph->Create(ivalue(car(sc->args)),
+                                (Graph::Type)ivalue(cadr(sc->args)),
+                                ivalue(caddr(sc->args)));
+          s_return(sc,sc->NIL);
+     }
+     case OP_FLUXA_CONNECT:
+     {
+          m_audio_graph->Connect(ivalue(car(sc->args)),
+                                 ivalue(cadr(sc->args)),
+                                 ivalue(caddr(sc->args)));
+          s_return(sc,sc->NIL);
+     }
+     case OP_FLUXA_PLAY:
+     {
+          m_audio_graph->Play(rvalue(car(sc->args)),
+                              ivalue(cadr(sc->args)),
+                              rvalue(caddr(sc->args)));
+          s_return(sc,sc->NIL);
      }
 
 

@@ -73,11 +73,14 @@ public class NetworkManager {
     }
 
     void Start(String ssid, StarwispActivity c, String name, StarwispBuilder b) {
+        Log.i("starwisp","Network startup!");
         m_CallbackName=name;
         m_Context=c;
         m_Builder=b;
 
         if (state==NetworkManager.State.IDLE) {
+            Log.i("starwisp","State is idle, launching scan");
+
             wifi = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
             state = State.SCANNING;
             SSID = ssid;
@@ -88,7 +91,10 @@ public class NetworkManager {
 
             // todo - won't work from inside fragments
             m_Builder.DialogCallback(m_Context,m_Context.m_Name,m_CallbackName,"\"Scanning\"");
-        } else {
+        }
+
+        if (state==NetworkManager.State.CONNECTED) {
+            Log.i("starwisp","State is connected, callback raised");
             m_Builder.DialogCallback(m_Context,m_Context.m_Name,m_CallbackName,"\"Connected\"");
         }
     }
@@ -103,7 +109,7 @@ public class NetworkManager {
         for( WifiConfiguration i : list ) {
             if(i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
                 found = true;
-                Log.i("starwisp", "Connecting");
+                Log.i("starwisp", "Connecting (state=connected)");
                 state=State.CONNECTED;
                 wifi.disconnect();
                 wifi.enableNetwork(i.networkId, true);
@@ -111,12 +117,13 @@ public class NetworkManager {
                 Log.i("starwisp", "Connected");
                 try {
                     Thread.sleep(2000);
+                    Log.i("starwisp","trying post-connection callback");
+                    m_Builder.DialogCallback(m_Context,m_Context.m_Name,m_CallbackName,"\"Connected\"");
                 } catch (Exception e) {
                     Log.i("starwisp",e.toString());
                     e.printStackTrace();
                 }
 
-                m_Builder.DialogCallback(m_Context,m_Context.m_Name,m_CallbackName,"\"Connected\"");
                 break;
             }
         }
@@ -345,6 +352,7 @@ public class NetworkManager {
 
                 for (ScanResult result : results) {
                     if (result.SSID.equals(SSID)) {
+                        Log.i("starwisp", "scan result for..."+SSID);
                         m_Builder.DialogCallback(m_Context,m_Context.m_Name,m_CallbackName,"\"In range\"");
                         nm.Connect();
                         return;

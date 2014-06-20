@@ -490,7 +490,8 @@ int main(int argc, char *argv[])
     appLoadTexture("stripes.png",w,h,(char *)tex);
 
 
-    appEval((char*)string("(pre-process-run '("+LoadFile("../assets/jellyfish.scm")+"))").c_str());
+    //appEval((char*)string("(pre-process-run '("+LoadFile("../assets/jellyfish.scm")+"))").c_str());
+    appEval(LoadFile("../assets/audio.scm").c_str());
 
 //    appEval((char*)string("(pre-process-run '((setup)))").c_str());
 

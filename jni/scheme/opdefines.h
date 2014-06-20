@@ -242,6 +242,10 @@
     _OP_DEF(opexe_6, "minverse",                       1,  1,       0,                               OP_MINVERSE )
     _OP_DEF(opexe_6, "bitwise-ior",                    3,  3,       0,                               OP_BITWISE_IOR )
     _OP_DEF(opexe_6, "destroy",                        1,  1,       0,                               OP_DESTROY )
+    _OP_DEF(opexe_6, "fluxa-init",                     2,  2,       0,                               OP_FLUXA_INIT )
+    _OP_DEF(opexe_6, "fluxa-create",                   3,  3,       0,                               OP_FLUXA_CREATE )
+    _OP_DEF(opexe_6, "fluxa-connect",                  3,  3,       0,                               OP_FLUXA_CONNECT )
+    _OP_DEF(opexe_6, "fluxa-play",                     3,  3,       0,                               OP_FLUXA_PLAY )
 
 
 #undef _OP_DEF
