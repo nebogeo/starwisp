@@ -64,7 +64,8 @@ public class Scheme
     public static void initGL() {
         synchronized (mLock) {
             nativeInitGL();
-            // only needed for symbai
+            // only (not) needed for symbai
+            // only needed for synth..
             //createEngine();
 
             Log.i("starwisp","loading textures");

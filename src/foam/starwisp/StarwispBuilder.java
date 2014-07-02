@@ -166,6 +166,10 @@ public class StarwispBuilder
         }
     }
 
+    public static int getPixelsFromDp(Context context, float dp) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int)(dp * scale + 0.5f);
+    }
 
     public void DialogCallback(StarwispActivity ctx, String ctxname, String name, String args)
     {
@@ -1216,7 +1220,11 @@ public class StarwispBuilder
             if (token.equals("animate")) {
                 JSONArray trans = arr.getJSONArray(3);
 
-                final TranslateAnimation animation = new TranslateAnimation(trans.getInt(0), trans.getInt(1), trans.getInt(2), trans.getInt(3));
+                final TranslateAnimation animation = new TranslateAnimation(
+                    getPixelsFromDp(ctx,trans.getInt(0)),
+                    getPixelsFromDp(ctx,trans.getInt(1)),
+                    getPixelsFromDp(ctx,trans.getInt(2)),
+                    getPixelsFromDp(ctx,trans.getInt(3)));
                 animation.setDuration(1000);
                 animation.setFillAfter(false);
                 animation.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
