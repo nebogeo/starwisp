@@ -105,6 +105,11 @@ import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.graphics.Matrix;
 import android.graphics.LightingColorFilter;
+import android.graphics.PorterDuff;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnticipateOvershootInterpolator;
 
 import android.content.ClipDescription;
 import android.content.ClipData;
@@ -144,54 +149,23 @@ public class StarwispBuilder
         m_SoundManager = new SoundManager();
     }
 
-    public int BuildOrientation(String p) {
-        if (p.equals("vertical")) return LinearLayout.VERTICAL;
-        if (p.equals("horizontal")) return LinearLayout.HORIZONTAL;
-        return LinearLayout.VERTICAL;
-    }
 
-    public int BuildLayoutGravity(String p) {
-        if (p.equals("centre")) return Gravity.CENTER;
-        if (p.equals("left")) return Gravity.LEFT;
-        if (p.equals("right")) return Gravity.RIGHT;
-        if (p.equals("fill")) return Gravity.FILL;
-        return Gravity.LEFT;
-    }
-
-    public int BuildLayoutParam(String p) {
-        if (p.equals("fill-parent")) return LayoutParams.FILL_PARENT;
-        if (p.equals("match-parent")) return LayoutParams.MATCH_PARENT;
-        if (p.equals("wrap-content")) return LayoutParams.WRAP_CONTENT;
+    public ViewGroup.LayoutParams BuildLayoutParams(JSONArray arr) {
         try {
-            return Integer.parseInt(p);
-        } catch (NumberFormatException e) {
-            Log.i("starwisp", "Layout error with ["+p+"]");
-            // send error message
-            return LayoutParams.WRAP_CONTENT;
-        }
-    }
-
-    public LinearLayout.LayoutParams BuildLayoutParams(JSONArray arr) {
-        try {
-            float weight = (float)arr.getDouble(3);
-            LinearLayout.LayoutParams lp;
-            if (weight == -1) {
-                lp = new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
-                                                   BuildLayoutParam(arr.getString(2)));
+            String layouttype = arr.getString(0);
+            if (layouttype.equals("relative-layout")) {
+                Log.i("starwisp","building relative layout params");
+                return StarwispRelativeLayout.BuildRelativeLayoutParams(arr);
             } else {
-                lp = new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
-                                                   BuildLayoutParam(arr.getString(2)),
-                                                   weight);
+                Log.i("starwisp","building linear layout params");
+                return StarwispLinearLayout.BuildLinearLayoutParams(arr);
             }
-            lp.gravity=BuildLayoutGravity(arr.getString(4));
-            int margin=arr.getInt(5);
-            lp.setMargins(margin,margin,margin,margin);
-            return lp;
         } catch (JSONException e) {
-            Log.e("starwisp", "Error parsing data " + e.toString());
+            Log.e("starwisp", "Error parsing layout param type " + e.toString());
             return null;
         }
     }
+
 
     public void DialogCallback(StarwispActivity ctx, String ctxname, String name, String args)
     {
@@ -310,7 +284,7 @@ public class StarwispBuilder
                 final int id=arr.getInt(1);
                 v.setPadding(10,0,40,0);
                 v.setId(id);
-                v.setOrientation(BuildOrientation(arr.getString(2)));
+                v.setOrientation(StarwispLinearLayout.BuildOrientation(arr.getString(2)));
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(3)));
                 v.setClickable(true);
                 v.setFocusable(true);
@@ -823,7 +797,7 @@ public class StarwispBuilder
                 parent.addView(horiz);
                 int height = arr.getInt(3);
                 int textsize = arr.getInt(4);
-                LinearLayout.LayoutParams lp = BuildLayoutParams(arr.getJSONArray(5));
+                LayoutParams lp = BuildLayoutParams(arr.getJSONArray(5));
                 JSONArray buttons = arr.getJSONArray(6);
                 int count = buttons.length();
                 int vertcount = 0;
@@ -1221,7 +1195,7 @@ public class StarwispBuilder
             }
 
             // now try and find the widget
-            View vv=ctx.findViewById(id);
+            final View vv=ctx.findViewById(id);
             if (vv==null)
             {
                 Log.i("starwisp", "Can't find widget : "+id);
@@ -1239,6 +1213,42 @@ public class StarwispBuilder
                 return;
             }
 
+            if (token.equals("animate")) {
+                JSONArray trans = arr.getJSONArray(3);
+
+                final TranslateAnimation animation = new TranslateAnimation(trans.getInt(0), trans.getInt(1), trans.getInt(2), trans.getInt(3));
+                animation.setDuration(1000);
+                animation.setFillAfter(false);
+                animation.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
+                animation.setAnimationListener(new AnimationListener() {
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        vv.clearAnimation();
+                        Log.i("starwisp","animation end");
+                        ((ViewManager)vv.getParent()).removeView(vv);
+
+
+                        //LayoutParams lp = new LayoutParams(imageView.getWidth(), imageView.getHeight());
+                        //lp.setMargins(50, 100, 0, 0);
+                        //imageView.setLayoutParams(lp);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        Log.i("starwisp","animation start");
+                    }
+
+
+                });
+
+                vv.startAnimation(animation);
+
+            }
+
             // tokens that work on everything
             if (token.equals("set-enabled")) {
                 Log.i("starwisp","set-enabled called...");
@@ -1251,7 +1261,8 @@ public class StarwispBuilder
             if (token.equals("background-colour")) {
                 JSONArray col = arr.getJSONArray(3);
                 //vv.setBackgroundColor();
-                vv.getBackground().setColorFilter(new LightingColorFilter(0xFF00FFFF, Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2))));
+                vv.getBackground().setColorFilter(Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2)), PorterDuff.Mode.MULTIPLY);
+                vv.invalidate();
             }
 
 
@@ -1260,6 +1271,11 @@ public class StarwispBuilder
 
             if (type.equals("linear-layout")) {
                 StarwispLinearLayout.Update(this,(LinearLayout)vv,token,ctx,ctxname,arr);
+                return;
+            }
+
+            if (type.equals("relative-layout")) {
+                StarwispRelativeLayout.Update(this,(RelativeLayout)vv,token,ctx,ctxname,arr);
                 return;
             }
 
@@ -1284,7 +1300,7 @@ public class StarwispBuilder
                     String buttontype = params.getString(0);
                     int height = params.getInt(1);
                     int textsize = params.getInt(2);
-                    LinearLayout.LayoutParams lp = BuildLayoutParams(params.getJSONArray(3));
+                    LayoutParams lp = BuildLayoutParams(params.getJSONArray(3));
                     final JSONArray buttons = params.getJSONArray(4);
                     final int count = buttons.length();
                     int vertcount = 0;
@@ -1429,6 +1445,7 @@ public class StarwispBuilder
                         //v.setMovementMethod(new ScrollingMovementMethod());
                     }
                     v.setText(arr.getString(3));
+//                    v.invalidate();
                 }
                 return;
             }

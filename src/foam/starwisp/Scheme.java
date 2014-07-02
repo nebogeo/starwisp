@@ -64,7 +64,8 @@ public class Scheme
     public static void initGL() {
         synchronized (mLock) {
             nativeInitGL();
-            createEngine();
+            // only needed for symbai
+            //createEngine();
 
             Log.i("starwisp","loading textures");
             loadTexture("peice.png");

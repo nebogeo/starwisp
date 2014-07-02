@@ -91,8 +91,9 @@ public class StarwispRelativeLayout
             RelativeLayout.LayoutParams lp =
                 new RelativeLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
                                                 BuildLayoutParam(arr.getString(2)));
-            int margin=arr.getInt(3);
-            lp.setMargins(margin,margin,margin,margin);
+            JSONArray margin=arr.getJSONArray(3);
+            lp.setMargins(margin.getInt(0),margin.getInt(1),
+                          margin.getInt(2),margin.getInt(3));
             AddRules(lp,arr.getJSONArray(4));
             return lp;
         } catch (JSONException e) {
@@ -126,6 +127,13 @@ public class StarwispRelativeLayout
         try {
             if (token.equals("contents")) {
                 v.removeAllViews();
+                JSONArray children = arr.getJSONArray(3);
+                for (int i=0; i<children.length(); i++) {
+                    b.Build(ctx,ctxname,new JSONArray(children.getString(i)), v);
+                }
+            }
+            if (token.equals("contents-add")) {
+                Log.i("starwisp","adding to relative layout...");
                 JSONArray children = arr.getJSONArray(3);
                 for (int i=0; i<children.length(); i++) {
                     b.Build(ctx,ctxname,new JSONArray(children.getString(i)), v);

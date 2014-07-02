@@ -16,6 +16,8 @@
 package foam.starwisp;
 
 import android.widget.LinearLayout;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Gravity;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -25,11 +27,63 @@ import android.util.Log;
 
 public class StarwispLinearLayout
 {
+
+    public static int BuildOrientation(String p) {
+        if (p.equals("vertical")) return LinearLayout.VERTICAL;
+        if (p.equals("horizontal")) return LinearLayout.HORIZONTAL;
+        return LinearLayout.VERTICAL;
+    }
+
+    public static int BuildLayoutGravity(String p) {
+        if (p.equals("centre")) return Gravity.CENTER;
+        if (p.equals("left")) return Gravity.LEFT;
+        if (p.equals("right")) return Gravity.RIGHT;
+        if (p.equals("fill")) return Gravity.FILL;
+        return Gravity.LEFT;
+    }
+
+    public static int BuildLayoutParam(String p) {
+        if (p.equals("fill-parent")) return LayoutParams.FILL_PARENT;
+        if (p.equals("match-parent")) return LayoutParams.MATCH_PARENT;
+        if (p.equals("wrap-content")) return LayoutParams.WRAP_CONTENT;
+        try {
+            return Integer.parseInt(p);
+        } catch (NumberFormatException e) {
+            Log.i("starwisp", "Layout error with ["+p+"]");
+            // send error message
+            return LayoutParams.WRAP_CONTENT;
+        }
+    }
+
+    public static LinearLayout.LayoutParams BuildLinearLayoutParams(JSONArray arr) {
+        try {
+            float weight = (float)arr.getDouble(3);
+            LinearLayout.LayoutParams lp;
+            if (weight == -1) {
+                lp = new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
+                                                   BuildLayoutParam(arr.getString(2)));
+            } else {
+                lp = new LinearLayout.LayoutParams(BuildLayoutParam(arr.getString(1)),
+                                                   BuildLayoutParam(arr.getString(2)),
+                                                   weight);
+            }
+            lp.gravity=BuildLayoutGravity(arr.getString(4));
+            int margin=arr.getInt(5);
+            lp.setMargins(margin,margin,margin,margin);
+            return lp;
+        } catch (JSONException e) {
+            Log.e("starwisp", "Error parsing data " + e.toString());
+            return null;
+        }
+    }
+
+
+
     public static void Build(StarwispBuilder b, final StarwispActivity ctx, final String ctxname, JSONArray arr, ViewGroup parent) {
         try {
             LinearLayout v = new LinearLayout(ctx);
             v.setId(arr.getInt(1));
-            v.setOrientation(b.BuildOrientation(arr.getString(2)));
+            v.setOrientation(BuildOrientation(arr.getString(2)));
             v.setLayoutParams(b.BuildLayoutParams(arr.getJSONArray(3)));
             //v.setPadding(2,2,2,2);
             JSONArray col = arr.getJSONArray(4);
@@ -46,6 +100,8 @@ public class StarwispLinearLayout
 
     public static void Update(StarwispBuilder b, LinearLayout v, String token, final StarwispActivity ctx, final String ctxname, JSONArray arr) {
         try {
+            Log.i("starwisp","linear:"+token);
+
             if (token.equals("contents")) {
                 v.removeAllViews();
                 JSONArray children = arr.getJSONArray(3);

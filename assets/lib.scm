@@ -417,7 +417,7 @@
 (define (layout-gravity l) (list-ref l 4))
 (define (layout-margin l) (list-ref l 5))
 
-(define (relative-layout width height margin rules) (list "relative-layout" width height margin rules))
+(define (rlayout width height margin rules) (list "relative-layout" width height margin rules))
 
 (define centre-layout (layout 'wrap-content 'wrap-content 1 'centre 0))
 
