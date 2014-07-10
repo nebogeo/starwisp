@@ -625,6 +625,7 @@ public class StarwispBuilder
                 v.setId(arr.getInt(1));
                 v.setText(arr.getString(2));
                 v.setTextSize(arr.getInt(3));
+                v.setGravity(Gravity.LEFT|Gravity.TOP);
 
                 String inputtype = arr.getString(4);
                 if (inputtype.equals("text")) {
@@ -1254,7 +1255,7 @@ public class StarwispBuilder
                 });
 
                 vv.startAnimation(animation);
-
+                return;
             }
 
             // tokens that work on everything
@@ -1262,7 +1263,12 @@ public class StarwispBuilder
                 Log.i("starwisp","set-enabled called...");
                 vv.setEnabled(arr.getInt(3)==1);
                 vv.setClickable(arr.getInt(3)==1);
-                vv.setBackgroundColor(0x00000000);
+                if (arr.getInt(3)==0) {
+                    //vv.setBackgroundColor(0x00000000);
+                    vv.getBackground().setColorFilter(0x20000000, PorterDuff.Mode.MULTIPLY);
+                } else {
+                    vv.getBackground().setColorFilter(null);
+                }
                 return;
             }
 
@@ -1271,6 +1277,7 @@ public class StarwispBuilder
                 //vv.setBackgroundColor();
                 vv.getBackground().setColorFilter(Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2)), PorterDuff.Mode.MULTIPLY);
                 vv.invalidate();
+                return;
             }
 
 

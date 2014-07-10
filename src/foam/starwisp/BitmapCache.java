@@ -35,11 +35,12 @@ public class BitmapCache
     {
         if (m_Cache.containsKey(Filename))
         {
-            Log.i("starwisp","returning cached bitmap...");
+            Log.i("starwisp","returning cached bitmap: "+Filename);
             return m_Cache.get(Filename);
         }
         else
         {
+            Log.i("starwisp","making new bitmap: "+Filename);
             Bitmap bitmap = BitmapFactory.decodeFile(Filename);
             if (bitmap!=null) {
                 // do the rotation here, so the photo shows the right way round
@@ -60,7 +61,9 @@ public class BitmapCache
                     }
 
                     bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 480, 640, false);
+
+                    //bitmap = Bitmap.createScaledBitmap(bitmap, 480, 640, false);
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 240, 320, false);
 
                     m_Cache.put(Filename,bitmap);
                     return bitmap;

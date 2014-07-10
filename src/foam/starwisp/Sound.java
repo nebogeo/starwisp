@@ -41,43 +41,51 @@ class SoundManager {
     }
 
     void StartRecording(String filename) {
-        mRecorder = new MediaRecorder();
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mRecorder.setOutputFile(filename);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        if (mRecorder==null) {
+            mRecorder = new MediaRecorder();
+            mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mRecorder.setOutputFile(filename);
+            mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-        Log.i("starwisp","starting to record:"+filename);
+            Log.i("starwisp","starting to record:"+filename);
 
-        try {
-            mRecorder.prepare();
-        } catch (IOException e) {
-            Log.e("startwisp", "sound record: prepare() failed");
+            try {
+                mRecorder.prepare();
+            } catch (IOException e) {
+                Log.e("startwisp", "sound record: prepare() failed");
+            }
+
+            mRecorder.start();
         }
-
-        mRecorder.start();
     }
 
     void StopRecording() {
-        mRecorder.stop();
-        mRecorder.release();
-        mRecorder = null;
+        if (mRecorder!=null) {
+            mRecorder.stop();
+            mRecorder.release();
+            mRecorder = null;
+        }
     }
 
     void StartPlaying(String filename) {
-        mPlayer = new MediaPlayer();
-        try {
-            mPlayer.setDataSource(filename);
-            mPlayer.prepare();
-            mPlayer.start();
-        } catch (IOException e) {
-            Log.e("starwisp", "sound play: prepare() failed");
+        if (mPlayer==null) {
+            mPlayer = new MediaPlayer();
+            try {
+                mPlayer.setDataSource(filename);
+                mPlayer.prepare();
+                mPlayer.start();
+            } catch (IOException e) {
+                Log.e("starwisp", "sound play: prepare() failed");
+            }
         }
     }
 
     void StopPlaying() {
-        mPlayer.release();
-        mPlayer = null;
+        if (mPlayer!=null) {
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
 };

@@ -109,6 +109,12 @@ public class StarwispLinearLayout
                     b.Build(ctx,ctxname,new JSONArray(children.getString(i)), v);
                 }
             }
+            if (token.equals("contents-add")) {
+                JSONArray children = arr.getJSONArray(3);
+                for (int i=0; i<children.length(); i++) {
+                    b.Build(ctx,ctxname,new JSONArray(children.getString(i)), v);
+                }
+            }
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data in StarwispLinearLayout " + e.toString());
         }
