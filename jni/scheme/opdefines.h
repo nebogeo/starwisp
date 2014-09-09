@@ -187,6 +187,8 @@
     _OP_DEF(opexe_5, 0,                                0,  0,       0,                               OP_PVECFROM         )
     _OP_DEF(opexe_6, "length",                         1,  1,       TST_LIST,                        OP_LIST_LENGTH      )
     _OP_DEF(opexe_6, "assq",                           2,  2,       TST_NONE,                        OP_ASSQ             )
+    _OP_DEF(opexe_6, "assoc-string-fast",              2,  2,       TST_NONE,                        OP_ASSOC_STRING_FAST)
+    _OP_DEF(opexe_6, "string-in-list-fast",            2,  2,       TST_NONE,                        OP_STRING_IN_LIST_FAST)
     _OP_DEF(opexe_6, "get-closure-code",               1,  1,       TST_NONE,                        OP_GET_CLOSURE      )
     _OP_DEF(opexe_6, "closure?",                       1,  1,       TST_NONE,                        OP_CLOSUREP         )
     _OP_DEF(opexe_6, "macro?",                         1,  1,       TST_NONE,                        OP_MACROP           )

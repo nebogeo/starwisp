@@ -4231,7 +4231,7 @@ pointer db_exec(scheme* sc, db *d) {
 static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
      pointer x, y;
      long v;
-
+     char *search;
      switch (op) {
      case OP_LIST_LENGTH:     /* length */   /* a.k */
           v=list_length(sc,car(sc->args));
@@ -4255,6 +4255,28 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                s_return(sc,sc->F);
           }
 
+     case OP_ASSOC_STRING_FAST:       /* assq */     /* a.k */
+          search = string_value(car(sc->args));
+          for (y = cadr(sc->args); is_pair(y); y = cdr(y)) {
+               if (!is_pair(car(y))) {
+                    Error_0(sc,"unable to handle non pair element");
+               }
+               if (!strcmp(search, string_value(caar(y))))
+                    break;
+          }
+          if (is_pair(y)) {
+               s_return(sc,car(y));
+          } else {
+               s_return(sc,sc->F);
+          }
+
+     case OP_STRING_IN_LIST_FAST:       /* assq */     /* a.k */
+          search = string_value(car(sc->args));
+          for (y = cadr(sc->args); is_pair(y); y = cdr(y)) {
+               if (!strcmp(search, string_value(car(y))))
+                    s_return(sc,sc->T);
+          }
+          s_return(sc,sc->F);
 
      case OP_GET_CLOSURE:     /* get-closure-code */   /* a.k */
           sc->args = car(sc->args);

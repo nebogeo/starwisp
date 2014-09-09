@@ -552,8 +552,9 @@ public class StarwispBuilder
                 v.setTextSize(arr.getInt(3));
                 v.setMovementMethod(LinkMovementMethod.getInstance());
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(4)));
-                v.setClickable(false);
-                v.setEnabled(false);
+                v.setLinkTextColor(0xffffffaa);
+                v.setClickable(true); // make links
+                v.setEnabled(true);   // go to browser
 
                 v.setOnTouchListener(new View.OnTouchListener() {
                     public boolean onTouch(View vv, MotionEvent event) {
@@ -572,7 +573,7 @@ public class StarwispBuilder
                         }
                     }
                 } else {
-                    v.setGravity(Gravity.LEFT);
+                    v.setGravity(Gravity.CENTER);
                 }
                 v.setTypeface(((StarwispActivity)ctx).m_Typeface);
                 parent.addView(v);
@@ -1263,11 +1264,13 @@ public class StarwispBuilder
                 Log.i("starwisp","set-enabled called...");
                 vv.setEnabled(arr.getInt(3)==1);
                 vv.setClickable(arr.getInt(3)==1);
-                if (arr.getInt(3)==0) {
-                    //vv.setBackgroundColor(0x00000000);
-                    vv.getBackground().setColorFilter(0x20000000, PorterDuff.Mode.MULTIPLY);
-                } else {
-                    vv.getBackground().setColorFilter(null);
+                if (vv.getBackground()!=null) {
+                    if (arr.getInt(3)==0) {
+                        //vv.setBackgroundColor(0x00000000);
+                        vv.getBackground().setColorFilter(0x20000000, PorterDuff.Mode.MULTIPLY);
+                    } else {
+                        vv.getBackground().setColorFilter(null);
+                    }
                 }
                 return;
             }

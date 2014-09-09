@@ -16,8 +16,11 @@
 package foam.starwisp;
 
 import java.util.ArrayList;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 
 import android.support.v4.app.FragmentActivity;
+import android.view.Window;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,6 +49,12 @@ public class StarwispActivity extends FragmentActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                             WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+
         setContentView(R.layout.main);
         OuyaController.init(this);
 

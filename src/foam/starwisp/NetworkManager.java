@@ -306,7 +306,7 @@ public class NetworkManager {
                 while ((line = reader.readLine()) != null) {
                     all+=line+"\n";
                 }
-                Log.i("starwisp","got data for "+m.m_CallbackName+"["+all+"]");
+                //Log.i("starwisp","got data for "+m.m_CallbackName+"["+all+"]");
 
                 synchronized (mLock)
                 {

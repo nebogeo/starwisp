@@ -41,6 +41,8 @@ class SoundManager {
     }
 
     void StartRecording(String filename) {
+        StopPlaying();
+        StopRecording();
         if (mRecorder==null) {
             mRecorder = new MediaRecorder();
             mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -69,6 +71,8 @@ class SoundManager {
     }
 
     void StartPlaying(String filename) {
+        StopPlaying();
+        StopRecording();
         if (mPlayer==null) {
             mPlayer = new MediaPlayer();
             try {
