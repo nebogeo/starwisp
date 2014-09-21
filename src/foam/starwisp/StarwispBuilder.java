@@ -1117,6 +1117,10 @@ public class StarwispBuilder
                 photo(ctx,arr.getString(3),arr.getInt(4));
             }
 
+            if (token.equals("process-image-in-place")) {
+                BitmapCache.ProcessInPlace(arr.getString(3));
+            }
+
             if (token.equals("send-mail")) {
                 final String to[] = new String[1];
                 to[0]=arr.getString(3);
