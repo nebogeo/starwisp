@@ -137,6 +137,8 @@ public class StarwispBuilder
     DorisLocationListener m_GPS;
     Handler m_Handler;
     SoundManager m_SoundManager;
+    SensorHandler m_SensorHandler;
+
 
     // resize all camera images to this resolution
     static int PHOTO_WIDTH=640;
@@ -257,7 +259,7 @@ public class StarwispBuilder
         try {
             String type = arr.getString(0);
 
-            Log.i("starwisp","building started "+type);
+            //Log.i("starwisp","building started "+type);
 
             if (type.equals("build-fragment")) {
                 String name = arr.getString(1);
@@ -882,7 +884,7 @@ public class StarwispBuilder
             final Integer id = arr.getInt(1);
             String token = arr.getString(2);
 
-            Log.i("starwisp", "Update: "+type+" "+id+" "+token);
+            //Log.i("starwisp", "Update: "+type+" "+id+" "+token);
 
             // non widget commands
             if (token.equals("toast")) {
@@ -1049,6 +1051,34 @@ public class StarwispBuilder
                 }
 
                 m_GPS.Start((StarwispActivity)ctx,name,this);
+                return;
+            }
+
+            if (token.equals("sensors-get")) {
+                final String name = arr.getString(3);
+                if (m_SensorHandler == null) {
+                    m_SensorHandler = new SensorHandler((StarwispActivity)ctx,this);
+                }
+                m_SensorHandler.GetSensors(name);
+                return;
+            }
+
+            if (token.equals("sensors-start")) {
+                final String name = arr.getString(3);
+
+                // start it up...
+                if (m_SensorHandler == null) {
+                    m_SensorHandler = new SensorHandler((StarwispActivity)ctx,this);
+                }
+                m_SensorHandler.StartSensors(name);
+
+                return;
+            }
+
+            if (token.equals("sensors-stop")) {
+                if (m_SensorHandler != null) {
+                    m_SensorHandler.StopSensors();
+                }
                 return;
             }
 

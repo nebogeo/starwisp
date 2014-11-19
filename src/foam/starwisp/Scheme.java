@@ -139,7 +139,7 @@ public class Scheme
         {
             //Log.i("starwisp",code);
             String ret=nativeEval(code);
-            Log.i("starwisp",ret);
+            //Log.i("starwisp",ret);
             return ret;
         }
     }
