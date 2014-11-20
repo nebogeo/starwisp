@@ -156,10 +156,8 @@ public class StarwispBuilder
         try {
             String layouttype = arr.getString(0);
             if (layouttype.equals("relative-layout")) {
-                Log.i("starwisp","building relative layout params");
                 return StarwispRelativeLayout.BuildRelativeLayoutParams(arr);
             } else {
-                Log.i("starwisp","building linear layout params");
                 return StarwispLinearLayout.BuildLinearLayoutParams(arr);
             }
         } catch (JSONException e) {
@@ -785,15 +783,20 @@ public class StarwispBuilder
                 CameraPreview v = new CameraPreview(ctx,pt);
                 final int wid = arr.getInt(1);
                 v.setId(wid);
-
-
-                //              LinearLayout.LayoutParams lp =
-                //  new LinearLayout.LayoutParams(minWidth, minHeight, 1);
-
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(2)));
-
-//                v.setLayoutParams(lp);
                 parent.addView(v);
+
+                Log.i("starwisp","in camera-preview...");
+
+                List<List<String>> info = v.mPictureTaker.GetInfo();
+                // can't find a way to do this via a callback yet
+                String arg = "'(";
+                for (List<String> e : info) {
+                    arg+="("+e.get(0)+" "+e.get(1)+")";
+                    Log.i("starwisp","converting prop "+arg);
+                }
+                arg+=")";
+                m_Scheme.eval("(set! camera-properties "+arg+")");
             }
 
             if (type.equals("button-grid")) {
@@ -1059,19 +1062,17 @@ public class StarwispBuilder
                 if (m_SensorHandler == null) {
                     m_SensorHandler = new SensorHandler((StarwispActivity)ctx,this);
                 }
-                m_SensorHandler.GetSensors(name);
+                m_SensorHandler.GetSensors((StarwispActivity)ctx,name,this);
                 return;
             }
 
             if (token.equals("sensors-start")) {
                 final String name = arr.getString(3);
-
                 // start it up...
                 if (m_SensorHandler == null) {
                     m_SensorHandler = new SensorHandler((StarwispActivity)ctx,this);
                 }
-                m_SensorHandler.StartSensors(name);
-
+                m_SensorHandler.StartSensors((StarwispActivity)ctx,name,this);
                 return;
             }
 
@@ -1322,6 +1323,7 @@ public class StarwispBuilder
             // special cases
 
             if (type.equals("linear-layout")) {
+                Log.i("starwisp","linear-layout update id: "+id);
                 StarwispLinearLayout.Update(this,(LinearLayout)vv,token,ctx,ctxname,arr);
                 return;
             }

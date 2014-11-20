@@ -40,18 +40,21 @@ class SensorHandler implements SensorEventListener  {
         //mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
-    public void GetSensors(String cbname) {
+    public void GetSensors(StarwispActivity c, String cbname, StarwispBuilder b) {
         String args = "(";
         for (int i=0; i<m_Sensors.size(); i++) {
             String name = m_Sensors.get(i).getName();
+            Log.i("starwisp",name);
             String type = String.valueOf(m_Sensors.get(i).getType());
             args += "(\""+name+"\" "+type+") ";
         }
         args+=")";
-        m_Builder.DialogCallback(m_Context,m_Context.m_Name,cbname,args);
+        b.DialogCallback(c,c.m_Name,cbname,args);
     }
 
-    public void StartSensors(String cbname) {
+    public void StartSensors(StarwispActivity c, String cbname, StarwispBuilder b) {
+        m_Context=c;
+        m_Builder=b;
         m_CallbackName = cbname;
         for (int i=0; i<m_Sensors.size(); i++) {
             // todo choose which are started up...

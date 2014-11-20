@@ -43,7 +43,7 @@ public class CameraPreview extends SurfaceView implements
         SurfaceHolder.Callback {
 
     private SurfaceHolder mSurfaceHolder;
-    PictureTaker mPictureTaker;
+    public PictureTaker mPictureTaker;
     Context mCtx;
 
     // Constructor that obtains context and camera

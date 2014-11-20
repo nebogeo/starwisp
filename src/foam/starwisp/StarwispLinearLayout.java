@@ -100,9 +100,8 @@ public class StarwispLinearLayout
 
     public static void Update(StarwispBuilder b, LinearLayout v, String token, final StarwispActivity ctx, final String ctxname, JSONArray arr) {
         try {
-            Log.i("starwisp","linear:"+token);
-
             if (token.equals("contents")) {
+                Log.i("starwisp","update ll contents");
                 v.removeAllViews();
                 JSONArray children = arr.getJSONArray(3);
                 for (int i=0; i<children.length(); i++) {

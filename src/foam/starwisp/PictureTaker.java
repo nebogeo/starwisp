@@ -23,6 +23,7 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.util.Log;
 import java.util.List;
+import java.util.ArrayList;
 
 class PictureTaker
 {
@@ -94,4 +95,49 @@ class PictureTaker
             Log.i("starwisp","Picture already being taken");
         }
     }
+
+
+    private List MakeElem(String key, String val) {
+        List<String> elem = new ArrayList<String>();
+        elem.add(key);
+        elem.add(val);
+        return elem;
+    }
+
+    public List<List<String>> GetInfo() {
+
+        List<List<String>> info = new ArrayList<List<String>>();
+
+        mCam = Camera.open();
+
+        if (mCam != null) {
+            Camera.Parameters p = mCam.getParameters();
+
+
+            info.add(MakeElem("vert-angle",""+p.getVerticalViewAngle()));
+            info.add(MakeElem("horis-angle",""+p.getHorizontalViewAngle()));
+            info.add(MakeElem("anti-banding",""+p.getAntibanding()));
+            info.add(MakeElem("color-effect",""+p.getColorEffect()));
+            info.add(MakeElem("exposure-compensation",""+p.getExposureCompensation()));
+            info.add(MakeElem("exposure-compensation-step",""+p.getExposureCompensationStep()));
+            info.add(MakeElem("flash-mode",""+p.getFlashMode()));
+            info.add(MakeElem("focal-length",""+p.getFocalLength()));
+            info.add(MakeElem("focus-mode",""+p.getFocusMode()));
+            info.add(MakeElem("jpg-quality",""+p.getJpegQuality()));
+            info.add(MakeElem("max-zoom",""+p.getMaxZoom()));
+            info.add(MakeElem("scene-mode",""+p.getSceneMode()));
+            info.add(MakeElem("white-balance",""+p.getWhiteBalance()));
+            info.add(MakeElem("zoom",""+p.getZoom()));
+            info.add(MakeElem("zoom-supported",""+p.isZoomSupported()));
+
+
+            mCam.release();
+            mCam = null;
+
+        }
+
+        return info;
+    }
+
+
 }
