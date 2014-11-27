@@ -4666,6 +4666,7 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
                                  ivalue(caddr(sc->args))
                         ));
      }
+
 /////////////////////////////////////////////////////////
      case OP_FLUXA_INIT:
      {

@@ -1663,11 +1663,13 @@ public class StarwispBuilder
     public String WalkDraggable(StarwispActivity ctx, String name, String ctxname, int id) {
         View v=ctx.findViewById(id);
         Class c = v.getClass();
-        String ret="(";
+        String ret="";
         if (c == LinearLayout.class) {
             LinearLayout l = (LinearLayout)v;
 
-            ret+=m_Scheme.eval("(widget-callback \""+ctxname+"\" "+id+" '())")+" ";
+            if (l.getChildCount()>1) ret+="(";
+
+            ret+=m_Scheme.eval("(run-draggable-callback \""+ctxname+"\" "+id+" '())")+" ";
 
             for (int i = 0; i < l.getChildCount(); i++) {
                 View cv = l.getChildAt(i);
@@ -1676,8 +1678,9 @@ public class StarwispBuilder
                     ret+=WalkDraggable(ctx, name, ctxname, cv.getId());
                 }
             }
+            if (l.getChildCount()>1) ret+=")";
+
         }
-        ret+=")";
 
         return ret;
     }
