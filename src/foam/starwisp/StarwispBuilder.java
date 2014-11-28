@@ -138,7 +138,7 @@ public class StarwispBuilder
     Handler m_Handler;
     SoundManager m_SoundManager;
     SensorHandler m_SensorHandler;
-
+    View m_LastDragHighlighted;
 
     // resize all camera images to this resolution
     static int PHOTO_WIDTH=640;
@@ -286,6 +286,7 @@ public class StarwispBuilder
             if (type.equals("draggable")) {
                 final LinearLayout v = new LinearLayout(ctx);
                 final int id=arr.getInt(1);
+                final String behaviour_type=arr.getString(5);
                 v.setPadding(10,0,40,0);
                 v.setId(id);
                 v.setOrientation(StarwispLinearLayout.BuildOrientation(arr.getString(2)));
@@ -302,105 +303,113 @@ public class StarwispBuilder
 
 
                 parent.addView(v);
-                JSONArray children = arr.getJSONArray(5);
+                JSONArray children = arr.getJSONArray(6);
                 for (int i=0; i<children.length(); i++) {
                     Build(ctx,ctxname,new JSONArray(children.getString(i)), v);
                 }
 
                 // Sets a long click listener for the ImageView using an anonymous listener object that
                 // implements the OnLongClickListener interface
-                v.setOnLongClickListener(new View.OnLongClickListener() {
-                    public boolean onLongClick(View vv) {
-                        if (id!=99) {
-                            ClipData dragData = new ClipData(
-                                new ClipDescription(null,new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }),
-                                new ClipData.Item(""+id));
+                if (!behaviour_type.equals("drop-only")) {
+                    v.setOnLongClickListener(new View.OnLongClickListener() {
+                        public boolean onLongClick(View vv) {
+                            if (id!=99) {
+                                ClipData dragData = new ClipData(
+                                    new ClipDescription(""+id,new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }),
+                                    new ClipData.Item(""+id));
 
-                            View.DragShadowBuilder myShadow = new MyDragShadowBuilder(v);
-                            Log.i("starwisp","start drag id "+vv.getId());
-                            v.startDrag(dragData, myShadow, null, 0);
-                            v.setVisibility(View.GONE);
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-
-                // Sets a long click listener for the ImageView using an anonymous listener object that
-                // implements the OnLongClickListener interface
-/*                v.setOnTouchListener(new View.OnTouchListener() {
-                    public boolean onTouch(View vv, MotionEvent event) {
-                        if (event.getAction()==MotionEvent.ACTION_DOWN && id!=99) {
-//                            ClipData dragData = ClipData.newPlainText("simple text", ""+id);
-
-                            ClipData dragData = new ClipData(
-                                new ClipDescription(null,new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }),
-                                new ClipData.Item(""+id));
-
-                            View.DragShadowBuilder myShadow = new MyDragShadowBuilder(v);
-                            Log.i("starwisp","start drag id "+vv.getId());
-                            v.startDrag(dragData, myShadow, null, 0);
-                            v.setVisibility(View.GONE);
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-*/
-
-
-
-                v.setOnDragListener(new View.OnDragListener() {
-                    public boolean onDrag(View vv, DragEvent event) {
-                        final int action = event.getAction();
-                        switch(action) {
-                        case DragEvent.ACTION_DRAG_STARTED:
-                            if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-                                // returns true to indicate that the View can accept the dragged data.
+                                View.DragShadowBuilder myShadow = new MyDragShadowBuilder(v);
+                                Log.i("starwisp","start drag id "+vv.getId()+" "+v);
+                                v.startDrag(dragData, myShadow, v, 0);
+                                v.setVisibility(View.GONE);
                                 return true;
-                            } else {
-                                // Returns false. During the current drag and drop operation, this View will
-                                // not receive events again until ACTION_DRAG_ENDED is sent.
-                                return false;
                             }
-                        case DragEvent.ACTION_DRAG_ENTERED: {
-                            return true;
+                            return false;
                         }
-                        case DragEvent.ACTION_DRAG_LOCATION: return true;
-                        case DragEvent.ACTION_DRAG_EXITED: {
-                            return true;
-                        }
-                        case DragEvent.ACTION_DROP: {
-                            ClipData.Item item = event.getClipData().getItemAt(0);
-                            String dragData = item.getText().toString();
-                            Log.i("starwisp","Dragged view is " + dragData);
-                            int otherid = Integer.parseInt(dragData);
-                            View otherw=ctx.findViewById(otherid);
-                            Log.i("starwisp","removing from parent "+((View)otherw.getParent()).getId());
+                    });
+                }
 
-                            // check we are not adding to ourself
-                            if (id!=otherid) {
-                                ((ViewManager)otherw.getParent()).removeView(otherw);
-                                Log.i("starwisp","adding to " + id);
-                                v.addView(otherw);
+
+                if (!behaviour_type.equals("drag-only")) {
+                    // ye gads - needed as drag/drop doesn't deal with nested targets
+                    final StarwispBuilder that = this;
+
+                    v.setOnDragListener(new View.OnDragListener() {
+                        public boolean onDrag(View vv, DragEvent event) {
+
+                            Log.i("starwisp","on drag event happened");
+
+                            final int action = event.getAction();
+                            switch(action) {
+                            case DragEvent.ACTION_DRAG_STARTED:
+                                Log.i("starwisp","Drag started"+v );
+                                if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+                                    // returns true to indicate that the View can accept the dragged data.
+                                    return true;
+                                } else {
+                                    // Returns false. During the current drag and drop operation, this View will
+                                    // not receive events again until ACTION_DRAG_ENDED is sent.
+                                    return false;
+                                }
+                            case DragEvent.ACTION_DRAG_ENTERED: {
+                                if (that.m_LastDragHighlighted!=null) {
+                                    that.m_LastDragHighlighted.getBackground().setColorFilter(null);
+                                }
+                                v.getBackground().setColorFilter(0x77777777, PorterDuff.Mode.MULTIPLY);
+                                that.m_LastDragHighlighted=v;
+                                Log.i("starwisp","Drag entered"+v );
+                                return true;
                             }
-                            otherw.setVisibility(View.VISIBLE);
-                            return true;
-                        }
-                        case DragEvent.ACTION_DRAG_ENDED: {
-                            if (event.getResult()) {
-                            } else {
+                            case DragEvent.ACTION_DRAG_LOCATION:
+                            {
+                                //View dragee = (View)event.getLocalState();
+                                //dragee.setVisibility(View.VISIBLE);
+                                Log.i("starwisp","Drag location"+v );
+                                return true;
+                            }
+                            case DragEvent.ACTION_DRAG_EXITED: {
+                                Log.i("starwisp","Drag exited "+v );
+                                v.getBackground().setColorFilter(null);
+                                return true;
+                            }
+                            case DragEvent.ACTION_DROP: {
+                                v.getBackground().setColorFilter(null);
+                                Log.i("starwisp","Drag dropped "+v );
+                                View otherw = (View)event.getLocalState();
+                                Log.i("starwisp","removing from parent "+((View)otherw.getParent()).getId());
+
+                                // check we are not adding to ourself
+                                if (id!=otherw.getId()) {
+                                    ((ViewManager)otherw.getParent()).removeView(otherw);
+                                    Log.i("starwisp","adding to " + id);
+                                    v.addView(otherw);
+                                }
+                                otherw.setVisibility(View.VISIBLE);
+                                return true;
+                            }
+                            case DragEvent.ACTION_DRAG_ENDED: {
+                                Log.i("starwisp","Drag ended "+v );
+                                v.getBackground().setColorFilter(null);
+
+                                View dragee = (View)event.getLocalState();
+                                dragee.setVisibility(View.VISIBLE);
+
+                                if (event.getResult()) {
+                                    Log.i("starwisp","sucess " );
+                                } else {
+                                    Log.i("starwisp","fail " );
+                                };
+                                return true;
+                            }
+                                // An unknown action type was received.
+                            default:
+                                Log.e("starwisp","Unknown action type received by OnDragListener.");
+                                break;
                             };
                             return true;
-                        }
-                            // An unknown action type was received.
-                        default:
-                            Log.e("starwisp","Unknown action type received by OnDragListener.");
-                            break;
-                        };
-                        return true;
-                    }});
-                return;
+                        }});
+                    return;
+                }
             }
 
             if (type.equals("frame-layout")) {
@@ -1712,16 +1721,16 @@ public class StarwispBuilder
 
   private static class MyDragShadowBuilder extends View.DragShadowBuilder {
     // The drag shadow image, defined as a drawable thing
-    private static Drawable shadow;
+//    private static Drawable shadow;
         public MyDragShadowBuilder(View v) {
             super(v);
             // Creates a draggable image that will fill the Canvas provided by the system.
-            shadow = new ColorDrawable(Color.BLUE);
+//            shadow = new ColorDrawable(Color.BLUE);
         }
 
         // Defines a callback that sends the drag shadow dimensions and touch point back to the
         // system.
-        @Override
+/*        @Override
         public void onProvideShadowMetrics (Point size, Point touch) {
             int width, height;
             width = getView().getWidth()/2;
@@ -1738,5 +1747,7 @@ public class StarwispBuilder
             // Draws the ColorDrawable in the Canvas passed in from the system.
             shadow.draw(canvas);
         }
+*/
     }
+
 }

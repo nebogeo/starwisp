@@ -76,13 +76,11 @@ public class StarwispActivity extends FragmentActivity
             Log.e("starwisp", "Error parsing ["+json+"] " + e.toString());
         }
     }
-
+/*
     @Override
     public boolean onGenericMotionEvent(final MotionEvent event) {
         //Get the player #
         int player = OuyaController.getPlayerNumByDeviceId(event.getDeviceId());
-
-        Log.i("starwisp","ogme");
 
         // Joystick
         if((event.getSource() & InputDevice.SOURCE_CLASS_JOYSTICK) != 0) {
@@ -95,10 +93,6 @@ public class StarwispActivity extends FragmentActivity
             float L2 = event.getAxisValue(OuyaController.AXIS_L2);
             float R2 = event.getAxisValue(OuyaController.AXIS_R2);
 
-            Log.i("starwisp","controller "+LS_X+" "+LS_Y+
-                  RS_X+" "+RS_Y+
-                  L2+" "+R2);
-
             Scheme.eval("(on-fling "+LS_X*-500+" "+LS_Y*-500+")");
         }
 
@@ -110,7 +104,7 @@ public class StarwispActivity extends FragmentActivity
 
         return true;
     }
-
+*/
 
 
     @Override
