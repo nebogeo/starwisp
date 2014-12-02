@@ -310,7 +310,8 @@ public class StarwispBuilder
 
                 // Sets a long click listener for the ImageView using an anonymous listener object that
                 // implements the OnLongClickListener interface
-                if (!behaviour_type.equals("drop-only")) {
+                if (!behaviour_type.equals("drop-only") &&
+                    !behaviour_type.equals("drop-only-consume")) {
                     v.setOnLongClickListener(new View.OnLongClickListener() {
                         public boolean onLongClick(View vv) {
                             if (id!=99) {
@@ -382,7 +383,10 @@ public class StarwispBuilder
                                 if (id!=otherw.getId()) {
                                     ((ViewManager)otherw.getParent()).removeView(otherw);
                                     Log.i("starwisp","adding to " + id);
-                                    v.addView(otherw);
+
+                                    if (!behaviour_type.equals("drop-only-consume")) {
+                                        v.addView(otherw);
+                                    }
                                 }
                                 otherw.setVisibility(View.VISIBLE);
                                 return true;
@@ -559,17 +563,20 @@ public class StarwispBuilder
                 v.setId(arr.getInt(1));
                 v.setText(Html.fromHtml(arr.getString(2)));
                 v.setTextSize(arr.getInt(3));
-                v.setMovementMethod(LinkMovementMethod.getInstance());
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(4)));
                 v.setLinkTextColor(0xffffffaa);
-                v.setClickable(true); // make links
-                v.setEnabled(true);   // go to browser
 
-                v.setOnTouchListener(new View.OnTouchListener() {
+                // uncomment all this to get hyperlinks to work in text...
+                // should make this an option of course
+
+               //v.setClickable(true); // make links
+                //v.setMovementMethod(LinkMovementMethod.getInstance());
+                //v.setEnabled(true);   // go to browser
+                /*v.setOnTouchListener(new View.OnTouchListener() {
                     public boolean onTouch(View vv, MotionEvent event) {
                         return false;
                     }
-                });
+                };*/
 
                 if (arr.length()>5) {
                     if (arr.getString(5).equals("left")) {
@@ -1096,7 +1103,7 @@ public class StarwispBuilder
                 final String name = arr.getString(3);
                 int iid = arr.getInt(5);
                 DialogCallback(ctx,ctxname,name,
-                               WalkDraggable(ctx,name,ctxname,iid));
+                               WalkDraggable(ctx,name,ctxname,iid).replace("\\", ""));
                 return;
             }
 
@@ -1675,22 +1682,27 @@ public class StarwispBuilder
         String ret="";
         if (c == LinearLayout.class) {
             LinearLayout l = (LinearLayout)v;
+            String result=m_Scheme.eval("(run-draggable-callback \""+ctxname+"\" "+id+" '())")+" ";
+            try {
+                JSONArray arr = new JSONArray(result);
 
-            if (l.getChildCount()>1) ret+="(";
+                int is_atom = arr.getInt(0);
+                if (is_atom==0) ret+="(";
+                ret += arr.getString(1)+" ";
 
-            ret+=m_Scheme.eval("(run-draggable-callback \""+ctxname+"\" "+id+" '())")+" ";
-
-            for (int i = 0; i < l.getChildCount(); i++) {
-                View cv = l.getChildAt(i);
-                Class cc = cv.getClass();
-                if (cc == LinearLayout.class) {
-                    ret+=WalkDraggable(ctx, name, ctxname, cv.getId());
+                for (int i = 0; i < l.getChildCount(); i++) {
+                    View cv = l.getChildAt(i);
+                    Class cc = cv.getClass();
+                    if (cc == LinearLayout.class) {
+                        ret+=WalkDraggable(ctx, name, ctxname, cv.getId());
+                    }
                 }
+                if (is_atom==0) ret+=")";
+            } catch (JSONException e) {
+                Log.e("starwisp", "Error parsing draggable code " + e.toString());
+                return "";
             }
-            if (l.getChildCount()>1) ret+=")";
-
         }
-
         return ret;
     }
 
