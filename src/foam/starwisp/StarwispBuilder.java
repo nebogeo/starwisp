@@ -1084,11 +1084,22 @@ public class StarwispBuilder
 
             if (token.equals("sensors-start")) {
                 final String name = arr.getString(3);
+                final JSONArray requested_json = arr.getJSONArray(5);
+                ArrayList<Integer> requested = new ArrayList<Integer>();
+
+                try {
+                    for (int i=0; i<requested_json.length(); i++) {
+                        requested.add(requested_json.getInt(i));
+                    }
+                } catch (JSONException e) {
+                    Log.e("starwisp", "Error parsing data in sensors start " + e.toString());
+                }
+
                 // start it up...
                 if (m_SensorHandler == null) {
                     m_SensorHandler = new SensorHandler((StarwispActivity)ctx,this);
                 }
-                m_SensorHandler.StartSensors((StarwispActivity)ctx,name,this);
+                m_SensorHandler.StartSensors((StarwispActivity)ctx,name,this,requested);
                 return;
             }
 

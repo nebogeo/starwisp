@@ -52,13 +52,27 @@ class SensorHandler implements SensorEventListener  {
         b.DialogCallback(c,c.m_Name,cbname,args);
     }
 
-    public void StartSensors(StarwispActivity c, String cbname, StarwispBuilder b) {
+    public void StartSensors(StarwispActivity c, String cbname, StarwispBuilder b, List<Integer> requested) {
         m_Context=c;
         m_Builder=b;
         m_CallbackName = cbname;
+
+        // clear any existing listeners
+        StopSensors();
+
         for (int i=0; i<m_Sensors.size(); i++) {
-            // todo choose which are started up...
-            m_SensorManager.registerListener(this, m_Sensors.get(i), SensorManager.SENSOR_DELAY_NORMAL);
+            Sensor sensor = m_Sensors.get(i);
+            int sensor_type = sensor.getType();
+            boolean found = false;
+
+            for (int j=0; j<requested.size(); j++) {
+                if (requested.get(j)==sensor_type) found=true;
+            }
+
+            if (found) {
+                // todo choose which are started up...
+                m_SensorManager.registerListener(this, m_Sensors.get(i), SensorManager.SENSOR_DELAY_NORMAL);
+            }
         }
     }
 

@@ -37,6 +37,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+import android.hardware.Sensor;
+
 public class StarwispActivity extends FragmentActivity
 {
     public String m_Name;
@@ -187,6 +189,32 @@ public class StarwispActivity extends FragmentActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         //No call for super(). Bug on API Level > 11.
+    }
+
+
+    protected void DeclareSensors() {
+        String str="";
+        str+="(define sensor-accelerometer "+Sensor.TYPE_ACCELEROMETER+")";
+        str+="(define sensor-ambient-temperature "+Sensor.TYPE_AMBIENT_TEMPERATURE+")";
+        str+="(define sensor-game-rotation-vector "+Sensor.TYPE_GAME_ROTATION_VECTOR+")";
+//        str+="(define sensor-geomagnetic-rotation-vector "+Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR+")";
+        str+="(define sensor-gravity "+Sensor.TYPE_GRAVITY+")";
+        str+="(define sensor-gyroscope "+Sensor.TYPE_GYROSCOPE+")";
+        str+="(define sensor-gyroscope-uncalibrated "+Sensor.TYPE_GYROSCOPE_UNCALIBRATED+")";
+//        str+="(define sensor-heart-rate "+Sensor.TYPE_HEART_RATE+")";
+        str+="(define sensor-light "+Sensor.TYPE_LIGHT+")";
+        str+="(define sensor-linear-accesleration "+Sensor.TYPE_LINEAR_ACCELERATION+")";
+        str+="(define sensor-magnetic-field "+Sensor.TYPE_MAGNETIC_FIELD+")";
+        str+="(define sensor-magnetic-field-uncalibrated "+Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED+")";
+        str+="(define sensor-orientation "+Sensor.TYPE_ORIENTATION+")";
+        str+="(define sensor-pressure "+Sensor.TYPE_PRESSURE+")";
+        str+="(define sensor-proximity "+Sensor.TYPE_PROXIMITY+")";
+        str+="(define sensor-relative-humidity "+Sensor.TYPE_RELATIVE_HUMIDITY+")";
+        str+="(define sensor-rotation-vector "+Sensor.TYPE_ROTATION_VECTOR+")";
+        str+="(define sensor-significant-motion "+Sensor.TYPE_SIGNIFICANT_MOTION+")";
+//        str+="(define sensor-step-counter "+Sensor.TYPE_STEP_COUNTER+")";
+//        str+="(define sensor-step-detector "+Sensor.TYPE_STEP_DETECTOR+")";
+        m_Scheme.eval(str);
     }
 
 }
