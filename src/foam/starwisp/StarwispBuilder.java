@@ -908,12 +908,10 @@ public class StarwispBuilder
             // non widget commands
             if (token.equals("toast")) {
                 Toast msg = Toast.makeText(ctx.getBaseContext(),arr.getString(3),Toast.LENGTH_SHORT);
-
                 LinearLayout linearLayout = (LinearLayout) msg.getView();
                 View child = linearLayout.getChildAt(0);
                 TextView messageTextView = (TextView) child;
-                messageTextView.setTextSize(30);
-
+                messageTextView.setTextSize(arr.getInt(4));
                 msg.show();
                 return;
             }

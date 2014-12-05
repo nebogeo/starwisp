@@ -70,6 +70,7 @@ class SensorHandler implements SensorEventListener  {
             }
 
             if (found) {
+                Log.i("starwisp","starting sensor "+sensor.getName());
                 // todo choose which are started up...
                 m_SensorManager.registerListener(this, m_Sensors.get(i), SensorManager.SENSOR_DELAY_NORMAL);
             }

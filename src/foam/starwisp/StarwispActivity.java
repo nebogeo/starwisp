@@ -203,7 +203,7 @@ public class StarwispActivity extends FragmentActivity
         str+="(define sensor-gyroscope-uncalibrated "+Sensor.TYPE_GYROSCOPE_UNCALIBRATED+")";
 //        str+="(define sensor-heart-rate "+Sensor.TYPE_HEART_RATE+")";
         str+="(define sensor-light "+Sensor.TYPE_LIGHT+")";
-        str+="(define sensor-linear-accesleration "+Sensor.TYPE_LINEAR_ACCELERATION+")";
+        str+="(define sensor-linear-acceleration "+Sensor.TYPE_LINEAR_ACCELERATION+")";
         str+="(define sensor-magnetic-field "+Sensor.TYPE_MAGNETIC_FIELD+")";
         str+="(define sensor-magnetic-field-uncalibrated "+Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED+")";
         str+="(define sensor-orientation "+Sensor.TYPE_ORIENTATION+")";
