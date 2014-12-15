@@ -287,7 +287,7 @@ public class StarwispBuilder
                 final LinearLayout v = new LinearLayout(ctx);
                 final int id=arr.getInt(1);
                 final String behaviour_type=arr.getString(5);
-                v.setPadding(10,0,40,0);
+                v.setPadding(10,0,10,0);
                 v.setId(id);
                 v.setOrientation(StarwispLinearLayout.BuildOrientation(arr.getString(2)));
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(3)));
@@ -297,10 +297,14 @@ public class StarwispBuilder
                 JSONArray col = arr.getJSONArray(4);
                 v.setBackgroundResource(R.drawable.draggable);
 
-                GradientDrawable drawable = (GradientDrawable) v.getBackground();
+                GradientDrawable drawable = (GradientDrawable)v.getBackground();
                 final int colour=Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2));
                 drawable.setColor(colour);
-
+         
+                /*LayerDrawable bgDrawable = (LayerDrawable)v.getBackground();
+                GradientDrawable bgShape = (GradientDrawable)bgDrawable.findDrawableByLayerId(R.id.draggableshape);
+                bgShape.setColor(colour);*/
+                /*v.getBackground().setColorFilter(colour, PorterDuff.Mode.MULTIPLY);*/
 
                 parent.addView(v);
                 JSONArray children = arr.getJSONArray(6);
