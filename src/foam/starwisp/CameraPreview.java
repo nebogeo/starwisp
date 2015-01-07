@@ -57,6 +57,10 @@ public class CameraPreview extends SurfaceView implements
         this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
+    public void TakenPicture() {
+        mPictureTaker.TakenPicture();
+    }
+
     public void TakePicture(PictureCallback cb) {
         mPictureTaker.TakePicture(this,cb);
     }
@@ -82,7 +86,7 @@ public class CameraPreview extends SurfaceView implements
         mPictureTaker.mCam.stopPreview();
 
         Parameters parameters = mPictureTaker.mCam.getParameters();
-        List<Size> list = parameters.getSupportedPictureSizes();
+        List<Size> list = parameters.getSupportedPreviewSizes();
 
         int minHeight=9999999;
         int minWidth=0;

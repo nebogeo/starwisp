@@ -300,7 +300,7 @@ public class StarwispBuilder
                 GradientDrawable drawable = (GradientDrawable)v.getBackground();
                 final int colour=Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2));
                 drawable.setColor(colour);
-         
+
                 /*LayerDrawable bgDrawable = (LayerDrawable)v.getBackground();
                 GradientDrawable bgShape = (GradientDrawable)bgDrawable.findDrawableByLayerId(R.id.draggableshape);
                 bgShape.setColor(colour);*/
@@ -1365,7 +1365,14 @@ public class StarwispBuilder
             if (type.equals("draggable")) {
                 LinearLayout v = (LinearLayout)vv;
                 if (token.equals("contents")) {
-//                    v.removeAllViews();
+                    v.removeAllViews();
+                    JSONArray children = arr.getJSONArray(3);
+                    for (int i=0; i<children.length(); i++) {
+                        Build(ctx,ctxname,new JSONArray(children.getString(i)), v);
+                    }
+                }
+
+                if (token.equals("contents-add")) {
                     JSONArray children = arr.getJSONArray(3);
                     for (int i=0; i<children.length(); i++) {
                         Build(ctx,ctxname,new JSONArray(children.getString(i)), v);
@@ -1620,6 +1627,26 @@ public class StarwispBuilder
                         });
                 }
 
+                // don't shut the activity down and use provided path
+                if (token.equals("take-picture-cont")) {
+                    final String path = ((StarwispActivity)ctx).m_AppDir+arr.getString(3);
+
+
+                    v.TakePicture(
+                        new PictureCallback() {
+                            public void onPictureTaken(byte[] input, Camera camera) {
+                                Bitmap original = BitmapFactory.decodeByteArray(input, 0, input.length);
+                                //Bitmap resized = Bitmap.createScaledBitmap(original, PHOTO_WIDTH, PHOTO_HEIGHT, true);
+                                ByteArrayOutputStream blob = new ByteArrayOutputStream();
+                                original.compress(Bitmap.CompressFormat.JPEG, 100, blob);
+                                String filename = path;
+                                Log.i("starwisp",path);
+                                SaveData(filename,blob.toByteArray());
+                                v.TakenPicture();
+                            }
+                        });
+                }
+
                 if (token.equals("shutdown")) {
                     v.Shutdown();
                 }
@@ -1724,6 +1751,7 @@ public class StarwispBuilder
             File file = new File(path);
 
             if (file == null) {
+                Log.i("starwisp","Couldn't open "+path+" for saving.");
                 return;
             }
             try {
@@ -1731,9 +1759,12 @@ public class StarwispBuilder
                 fos.write(data);
                 fos.close();
             } catch (FileNotFoundException e) {
+                Log.i("starwisp","Couldn't open "+path+": file not found caught.");
             } catch (IOException e) {
+                Log.i("starwisp","Couldn't open "+path+": ioexception caught.");
             }
         } catch (Exception e) {
+            Log.i("starwisp","Couldn't open "+path+": exception caught.");
         }
     }
 
