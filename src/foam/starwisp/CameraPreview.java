@@ -98,8 +98,20 @@ public class CameraPreview extends SurfaceView implements
         }
 
         Log.i("starwisp","camera layout: "+minWidth+" "+minHeight);
-
         parameters.setPreviewSize(minWidth, minHeight);
+
+        list = parameters.getSupportedPictureSizes();
+        int maxHeight=0;
+        int maxWidth=0;
+        for(int i = 0; i<list.size(); i++){
+            if(list.get(i).height>maxHeight){
+                maxHeight = list.get(i).height;
+                maxWidth = list.get(i).width;
+            }
+        }
+        Log.i("starwisp","camera picture size: "+maxWidth+" "+maxHeight);
+        parameters.setPictureSize(maxWidth, maxHeight);
+
         mPictureTaker.mCam.setParameters(parameters);
         mPictureTaker.mCam.startPreview();
 

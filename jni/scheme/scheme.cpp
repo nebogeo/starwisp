@@ -4388,9 +4388,12 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
           // stop valgrind complaining
           t.tv_sec=0;
           t.tv_usec=0;
+
           gettimeofday(&t,NULL);
 
-          struct tm *now = gmtime((time_t *)&t.tv_sec);
+          // NOTE: this seems to be UTC - not current timezone
+          //struct tm *now = gmtime((time_t *)&t.tv_sec);
+          struct tm *now = localtime((time_t *)&t.tv_sec);
 
           /* note: now->tm_year is the number of years SINCE 1900.  On the year 2000, this
              will be 100 not 0.  Do a man gmtime for more information */

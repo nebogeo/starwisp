@@ -74,6 +74,7 @@ class PictureTaker
                 if (mCam == null) {
                     return;
                 }
+
                 mCam.setPreviewDisplay(view.getHolder());
                 mCam.startPreview();
             }
@@ -95,14 +96,15 @@ class PictureTaker
     // for use in the callback passed to take picture...
     public void TakenPicture() {
         mTakingPicture=false;
+        mCam.startPreview();
     }
 
     public void TakePicture(SurfaceView view, PictureCallback picture)
     {
-        if (!mTakingPicture) {
+//        if (!mTakingPicture) {
             mTakingPicture=true;
-            CloseCamera();
-            OpenCamera(view);
+//            CloseCamera();
+//            OpenCamera(view);
 
             try {
                 mCam.takePicture(null, null, picture);
@@ -110,10 +112,11 @@ class PictureTaker
             catch (Exception e) {
                 Log.i("starwisp","Problem taking picture: " + e);
             }
-        }
+/*        }
         else {
             Log.i("starwisp","Picture already being taken");
         }
+*/
     }
 
 

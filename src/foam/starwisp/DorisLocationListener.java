@@ -55,15 +55,19 @@ public class DorisLocationListener implements LocationListener {
     String m_CallbackName;
     StarwispActivity m_Context;
     StarwispBuilder m_Builder;
+    int m_MinMSecs;
+    int m_MinMetres;
 
     public DorisLocationListener(LocationManager lm) {
 		locationManager = lm;
     }
 
-    public void Start(StarwispActivity c, String name, StarwispBuilder b) {
+    public void Start(StarwispActivity c, String name, StarwispBuilder b, int min_millisecs, int min_metres) {
         m_CallbackName=name;
         m_Context=c;
         m_Builder=b;
+        m_MinMSecs = min_millisecs;
+        m_MinMetres = min_metres;
         setDeviceLocation();
     }
 
@@ -116,14 +120,15 @@ public class DorisLocationListener implements LocationListener {
 		// If chosen location is more than a minute old, start querying
 		// network/GPS
 		if (currrentLocation == null
-				|| (new Date()).getTime() - currrentLocation.getTime() > ONE_MINUTE) {
+            || (new Date()).getTime() - currrentLocation.getTime() > ONE_MINUTE) {
 			if (netAvailable) {
 				locationManager.requestLocationUpdates(
-						LocationManager.NETWORK_PROVIDER, 3*60*1000, 5, this);
+                    //LocationManager.NETWORK_PROVIDER, 500, 5, this);
+                    LocationManager.NETWORK_PROVIDER, m_MinMSecs, m_MinMetres, this);
 			}
 			if (gpsAvailable) {
 				locationManager.requestLocationUpdates(
-						LocationManager.GPS_PROVIDER, 3*60*1000, 5, this);
+                    LocationManager.GPS_PROVIDER, m_MinMSecs, m_MinMetres, this);
 			}
 		}
 	}

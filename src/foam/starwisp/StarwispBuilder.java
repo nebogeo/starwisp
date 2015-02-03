@@ -287,7 +287,7 @@ public class StarwispBuilder
                 final LinearLayout v = new LinearLayout(ctx);
                 final int id=arr.getInt(1);
                 final String behaviour_type=arr.getString(5);
-                v.setPadding(10,0,10,0);
+                v.setPadding(20,20,20,10);
                 v.setId(id);
                 v.setOrientation(StarwispLinearLayout.BuildOrientation(arr.getString(2)));
                 v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(3)));
@@ -1071,7 +1071,7 @@ public class StarwispBuilder
                     m_GPS = new DorisLocationListener(m_LocationManager);
                 }
 
-                m_GPS.Start((StarwispActivity)ctx,name,this);
+                m_GPS.Start((StarwispActivity)ctx,name,this,arr.getInt(5),arr.getInt(6));
                 return;
             }
 
@@ -1631,14 +1631,18 @@ public class StarwispBuilder
                 if (token.equals("take-picture-cont")) {
                     final String path = ((StarwispActivity)ctx).m_AppDir+arr.getString(3);
 
+                    Log.i("starwisp","take-picture-cont fired");
 
                     v.TakePicture(
                         new PictureCallback() {
                             public void onPictureTaken(byte[] input, Camera camera) {
+                                Log.i("starwisp","on picture taken...");
+
                                 Bitmap original = BitmapFactory.decodeByteArray(input, 0, input.length);
                                 //Bitmap resized = Bitmap.createScaledBitmap(original, PHOTO_WIDTH, PHOTO_HEIGHT, true);
                                 ByteArrayOutputStream blob = new ByteArrayOutputStream();
-                                original.compress(Bitmap.CompressFormat.JPEG, 100, blob);
+                                original.compress(Bitmap.CompressFormat.JPEG, 95, blob);
+                                original.recycle();
                                 String filename = path;
                                 Log.i("starwisp",path);
                                 SaveData(filename,blob.toByteArray());
