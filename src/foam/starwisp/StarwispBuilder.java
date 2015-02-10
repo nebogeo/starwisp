@@ -1147,7 +1147,19 @@ public class StarwispBuilder
                     Log.i("starwisp","attempting http request");
                     final String name = arr.getString(3);
                     final String url = arr.getString(5);
-                    m_NetworkManager.StartRequestThread(url,"normal",name);
+                    m_NetworkManager.StartRequestThread(url,"normal","",name);
+                }
+                return;
+            }
+
+            if (token.equals("http-post")) {
+                Log.i("starwisp","http-post called");
+                if (m_NetworkManager.state==NetworkManager.State.CONNECTED) {
+                    Log.i("starwisp","attempting http request");
+                    final String name = arr.getString(3);
+                    final String url = arr.getString(5);
+                    final String data = arr.getString(6);
+                    m_NetworkManager.StartRequestThread(url,"post",data,name);
                 }
                 return;
             }
@@ -1157,7 +1169,7 @@ public class StarwispBuilder
                     Log.i("starwisp","attempting http ul request");
                     final String filename = arr.getString(4);
                     final String url = arr.getString(5);
-                    m_NetworkManager.StartRequestThread(url,"upload",filename);
+                    m_NetworkManager.StartRequestThread(url,"upload","",filename);
                 }
                 return;
             }
@@ -1168,7 +1180,7 @@ public class StarwispBuilder
                     Log.i("starwisp","attempting http dl request");
                     final String filename = arr.getString(4);
                     final String url = arr.getString(5);
-                    m_NetworkManager.StartRequestThread(url,"download",filename);
+                    m_NetworkManager.StartRequestThread(url,"download","",filename);
                 }
                 return;
             }
@@ -1219,10 +1231,8 @@ public class StarwispBuilder
             };
 
             if (token.equals("alert-dialog")) {
-
                 final String name = arr.getString(3);
                 final String msg = arr.getString(5);
-
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -1231,11 +1241,25 @@ public class StarwispBuilder
                         DialogCallback(ctx, ctxname, name, ""+result);
                     }
                 };
-
                 AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
                 builder.setMessage(msg).setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("No", dialogClickListener).show();
+                return;
+            }
 
+            if (token.equals("ok-dialog")) {
+                final String name = arr.getString(3);
+                final String msg = arr.getString(5);
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int result = 0;
+                        if (which==DialogInterface.BUTTON_POSITIVE) result=1;
+                        DialogCallback(ctx, ctxname, name, ""+result);
+                    }
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+                builder.setMessage(msg).setPositiveButton("Ok", dialogClickListener).show();
                 return;
             }
 

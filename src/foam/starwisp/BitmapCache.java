@@ -79,6 +79,7 @@ public class BitmapCache
 
                 FileOutputStream out = new FileOutputStream(Filename);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                bitmap.recycle();
             }
             catch (IOException e) {
                 Log.i("starwisp-cache","problem processing bitmap: "+Filename);

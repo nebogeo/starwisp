@@ -36,6 +36,7 @@ import android.net.wifi.WifiConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,10 +46,14 @@ import java.util.ArrayList;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.net.URLConnection;
-
+import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import android.os.SystemClock;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 public class NetworkManager {
 
@@ -144,7 +149,7 @@ public class NetworkManager {
 
     }
 
-    public void StartRequestThread(final String url, final String t, final String callbackname) {
+    public void StartRequestThread(final String url, final String t, final String data, final String callbackname) {
         Runnable runnable = new Runnable() {
 	        public void run() {
                 if (t.equals("upload")) { // this is a post file thing
@@ -158,7 +163,11 @@ public class NetworkManager {
                         e.printStackTrace();
                     }
                 } else {
-                    Request(url, t, callbackname);
+                    if (t.equals("post")) {
+                        Post(url, t, data, callbackname);
+                    } else {
+                        Request(url, t, callbackname);
+                    }
                 }
 	        }
         };
@@ -189,6 +198,70 @@ public class NetworkManager {
             con.setConnectTimeout(150000 /* milliseconds */);
             con.setRequestMethod("GET");
             con.setDoInput(true);
+            // Starts the query
+            con.connect();
+            m_RequestHandler.sendMessage(
+                Message.obtain(m_RequestHandler, 0,
+                               new ReqMsg(con.getInputStream(),type,CallbackName)));
+
+        } catch (Exception e) {
+            Log.i("starwisp",e.toString());
+            e.printStackTrace();
+        }
+    }
+
+
+    // util for posting
+    private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException
+    {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        for (NameValuePair pair : params)
+        {
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            try {
+                result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
+                result.append("=");
+                result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+            }
+            catch (UnsupportedEncodingException e) {
+                Log.i("starwisp","URL Encoding went wrong in getQuery");
+            }
+        }
+
+        return result.toString();
+    }
+
+    private void Post(String u, String type, String data, String CallbackName) {
+        try {
+            Log.i("starwisp","posting: "+u);
+            URL url = new URL(u);
+            HttpURLConnection con = (HttpURLConnection) url
+                .openConnection();
+
+            con.setUseCaches(false);
+            con.setReadTimeout(100000 /* milliseconds */);
+            con.setConnectTimeout(150000 /* milliseconds */);
+            con.setRequestMethod("POST");
+            con.setDoInput(true);
+            con.setDoOutput(true);
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("data", data));
+
+            OutputStream os = con.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(os, "UTF-8"));
+            writer.write(getQuery(params));
+            writer.flush();
+            writer.close();
+            os.close();
+
             // Starts the query
             con.connect();
             m_RequestHandler.sendMessage(
