@@ -103,14 +103,18 @@ class PictureTaker
     {
 //        if (!mTakingPicture) {
             mTakingPicture=true;
-//            CloseCamera();
-//            OpenCamera(view);
+
+            if (mCam==null) {
+                OpenCamera(view);
+            }
 
             try {
                 mCam.takePicture(null, null, picture);
             }
             catch (Exception e) {
                 Log.i("starwisp","Problem taking picture: " + e);
+                CloseCamera();
+                OpenCamera(view);
             }
 /*        }
         else {
