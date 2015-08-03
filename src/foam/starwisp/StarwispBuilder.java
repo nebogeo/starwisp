@@ -41,6 +41,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -1561,6 +1562,10 @@ public class StarwispBuilder
                     v.setText(arr.getString(3));
 //                    v.invalidate();
                 }
+                if (token.equals("file")) {
+                    v.setText(LoadData(arr.getString(3)));
+                }
+
                 return;
             }
 
@@ -1794,6 +1799,29 @@ public class StarwispBuilder
         } catch (Exception e) {
             Log.i("starwisp","Couldn't open "+path+": exception caught.");
         }
+    }
+
+    public static String LoadData(String fn)
+    {
+        File f = new File(fn);
+        if (f.exists()) {
+            try {
+                StringBuffer inLine = new StringBuffer();
+                FileReader fr = new FileReader(f);
+                BufferedReader br = new BufferedReader(fr);
+                String text;
+                while ((text = br.readLine()) != null) {
+                    inLine.append(text);
+                    inLine.append("\n");
+                }
+                return inLine.toString();
+            }
+            catch(Exception e)
+            {
+                return "";
+            }
+        }
+        return "";
     }
 
 	public static String getDateTime() {

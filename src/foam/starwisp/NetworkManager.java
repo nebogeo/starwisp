@@ -367,9 +367,13 @@ public class NetworkManager {
 
                 // we need to know how may bytes were read to write them to the byteBuffer
                 int len = 0;
+
+                Toast.makeText(m_Context,"Starting download for "+m.m_CallbackName,Toast.LENGTH_LONG).show();
                 while ((len = in.read(buffer)) != -1) {
                     byteBuffer.write(buffer, 0, len);
                 }
+                Toast.makeText(m_Context,"Finished downloading "+m.m_CallbackName,Toast.LENGTH_LONG).show();
+
                 m_Builder.SaveData(m.m_CallbackName, byteBuffer.toByteArray());
             } else {
                 // results in evaluating data read from via http - fix if used from net

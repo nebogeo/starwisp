@@ -5324,11 +5324,11 @@ static pointer _Error_1(scheme *sc, const char *s, pointer a) {
        /* should never happen */
        if(!fname) fname = "<unknown>";
 
-       dump_stack_print(sc, stkbuf);
-
        /* we started from 0 */
        ln++;
-       snprintf(sbuf, STRBUFFSIZE, "(%s : %i) %s\n%s", fname, ln, s, stkbuf);
+       snprintf(sbuf, STRBUFFSIZE, "(%s : %i) %s\n", fname, ln, s);
+
+       dump_stack_print(sc, stkbuf);
 
        str = (const char*)sbuf;
      }
