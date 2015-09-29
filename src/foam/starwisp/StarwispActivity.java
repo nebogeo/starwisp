@@ -197,11 +197,11 @@ public class StarwispActivity extends FragmentActivity
         str+="(define sensor-accelerometer "+Sensor.TYPE_ACCELEROMETER+")";
         str+="(define sensor-ambient-temperature "+Sensor.TYPE_AMBIENT_TEMPERATURE+")";
         str+="(define sensor-game-rotation-vector "+Sensor.TYPE_GAME_ROTATION_VECTOR+")";
-//        str+="(define sensor-geomagnetic-rotation-vector "+Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR+")";
+        str+="(define sensor-geomagnetic-rotation-vector "+Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR+")";
         str+="(define sensor-gravity "+Sensor.TYPE_GRAVITY+")";
         str+="(define sensor-gyroscope "+Sensor.TYPE_GYROSCOPE+")";
         str+="(define sensor-gyroscope-uncalibrated "+Sensor.TYPE_GYROSCOPE_UNCALIBRATED+")";
-//        str+="(define sensor-heart-rate "+Sensor.TYPE_HEART_RATE+")";
+        str+="(define sensor-heart-rate "+Sensor.TYPE_HEART_RATE+")";
         str+="(define sensor-light "+Sensor.TYPE_LIGHT+")";
         str+="(define sensor-linear-acceleration "+Sensor.TYPE_LINEAR_ACCELERATION+")";
         str+="(define sensor-magnetic-field "+Sensor.TYPE_MAGNETIC_FIELD+")";
@@ -212,8 +212,8 @@ public class StarwispActivity extends FragmentActivity
         str+="(define sensor-relative-humidity "+Sensor.TYPE_RELATIVE_HUMIDITY+")";
         str+="(define sensor-rotation-vector "+Sensor.TYPE_ROTATION_VECTOR+")";
         str+="(define sensor-significant-motion "+Sensor.TYPE_SIGNIFICANT_MOTION+")";
-//        str+="(define sensor-step-counter "+Sensor.TYPE_STEP_COUNTER+")";
-//        str+="(define sensor-step-detector "+Sensor.TYPE_STEP_DETECTOR+")";
+        str+="(define sensor-step-counter "+Sensor.TYPE_STEP_COUNTER+")";
+        str+="(define sensor-step-detector "+Sensor.TYPE_STEP_DETECTOR+")";
         m_Scheme.eval(str);
     }
 

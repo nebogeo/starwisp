@@ -4300,8 +4300,17 @@ static pointer opexe_6(scheme *sc, enum scheme_opcodes op) {
 ///////////// FLUXUS
      case OP_ALOG:
           #ifdef ANDROID_NDK
-          __android_log_print(ANDROID_LOG_INFO, "starwisp", string_value(car(sc->args)));
+          __android_log_print(ANDROID_LOG_INFO, "starwisp", "%s", string_value(car(sc->args)));
           #endif
+          s_return(sc,sc->F);
+     case OP_LOG_TO_FILE: {
+          FILE *l=fopen(string_value(car(sc->args)),"a");
+          if (l!=NULL) {
+               char *txt=string_value(cadr(sc->args));
+               fwrite(txt,strlen(txt),1,l);
+               fclose(l);
+          }
+     }
           s_return(sc,sc->F);
      case OP_SEND:
           if (is_string(car(sc->args))) {

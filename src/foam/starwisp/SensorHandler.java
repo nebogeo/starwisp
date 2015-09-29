@@ -31,11 +31,17 @@ class SensorHandler implements SensorEventListener  {
     private final SensorManager m_SensorManager;
     private final List<Sensor> m_Sensors;
 
+    // need to keep track of these to determine the orientation
+    float[] m_Gravity;
+    float[] m_Geomagnetic;
+    float[] m_Orientation;
+
     public SensorHandler(StarwispActivity c, StarwispBuilder b) {
         m_Context=c;
         m_Builder=b;
         m_SensorManager = (SensorManager)c.getSystemService(Context.SENSOR_SERVICE);
         m_Sensors =  m_SensorManager.getSensorList(Sensor.TYPE_ALL);
+        m_Orientation = new float[3];
 
         //mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
@@ -81,22 +87,62 @@ class SensorHandler implements SensorEventListener  {
         m_SensorManager.unregisterListener(this);
     }
 
-
-
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-    public void onSensorChanged(SensorEvent event) {
-        String name = event.sensor.getName();
-        String type = String.valueOf(event.sensor.getType());
+    public boolean updateOrientation(SensorEvent event) {
+        // calculate orientation in the new manner
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            m_Gravity = event.values;
+        }
+
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            m_Geomagnetic = event.values;
+            if (m_Gravity != null && m_Geomagnetic != null) {
+                float R[] = new float[9];
+                float I[] = new float[9];
+                boolean success = SensorManager.getRotationMatrix(R, I, m_Gravity, m_Geomagnetic);
+                if (success) {
+                    SensorManager.getOrientation(R, m_Orientation);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String buildSensorString(String name, String type, SensorEvent event, float[] values) {
         String args = "(\""+name+"\" "+type+" "+
             String.valueOf(event.accuracy)+" "+
             String.valueOf(event.timestamp)+" ";
 
-        for (int i=0; i<event.values.length; i++) {
-            args+=String.valueOf(event.values[i])+" ";
+        for (int i=0; i<values.length; i++) {
+            args+=String.valueOf(values[i])+" ";
         }
         args +=")";
+        return args;
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType == Sensor.TYPE_ORIENTATION) {
+            // this sensor is depreciated
+            return;
+        }
+
+        String args;
+        if (updateOrientation(event)) {
+            // piggyback on type_orientation for the time being
+            args = buildSensorString("calculated orientation",
+                                     String.valueOf(Sensor.TYPE_ORIENTATION),
+                                     event,
+                                     m_Orientation);
+        }
+
+        // build it normally from the sensor data
+        args = buildSensorString(event.sensor.getName(),
+                                 String.valueOf(event.sensor.getType()),
+                                 event,
+                                 sensor.values);
 
         m_Builder.DialogCallback(m_Context,m_Context.m_Name,m_CallbackName,args);
     }
