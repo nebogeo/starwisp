@@ -124,25 +124,28 @@ class SensorHandler implements SensorEventListener  {
     }
 
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType == Sensor.TYPE_ORIENTATION) {
+        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
             // this sensor is depreciated
             return;
         }
 
         String args;
+        // check for calculated orientation...
         if (updateOrientation(event)) {
             // piggyback on type_orientation for the time being
             args = buildSensorString("calculated orientation",
                                      String.valueOf(Sensor.TYPE_ORIENTATION),
                                      event,
                                      m_Orientation);
+
+            m_Builder.DialogCallback(m_Context,m_Context.m_Name,m_CallbackName,args);
         }
 
         // build it normally from the sensor data
         args = buildSensorString(event.sensor.getName(),
                                  String.valueOf(event.sensor.getType()),
                                  event,
-                                 sensor.values);
+                                 event.values);
 
         m_Builder.DialogCallback(m_Context,m_Context.m_Name,m_CallbackName,args);
     }

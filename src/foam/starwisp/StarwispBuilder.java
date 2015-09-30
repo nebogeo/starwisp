@@ -343,12 +343,12 @@ public class StarwispBuilder
                     v.setOnDragListener(new View.OnDragListener() {
                         public boolean onDrag(View vv, DragEvent event) {
 
-                            Log.i("starwisp","on drag event happened");
+                            //Log.i("starwisp","on drag event happened");
 
                             final int action = event.getAction();
                             switch(action) {
                             case DragEvent.ACTION_DRAG_STARTED:
-                                Log.i("starwisp","Drag started"+v );
+                                //Log.i("starwisp","Drag started"+v );
                                 if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
                                     // returns true to indicate that the View can accept the dragged data.
                                     return true;
@@ -363,31 +363,31 @@ public class StarwispBuilder
                                 }
                                 v.getBackground().setColorFilter(0x77777777, PorterDuff.Mode.MULTIPLY);
                                 that.m_LastDragHighlighted=v;
-                                Log.i("starwisp","Drag entered"+v );
+                                //Log.i("starwisp","Drag entered"+v );
                                 return true;
                             }
                             case DragEvent.ACTION_DRAG_LOCATION:
                             {
                                 //View dragee = (View)event.getLocalState();
                                 //dragee.setVisibility(View.VISIBLE);
-                                Log.i("starwisp","Drag location"+v );
+                                //Log.i("starwisp","Drag location"+v );
                                 return true;
                             }
                             case DragEvent.ACTION_DRAG_EXITED: {
-                                Log.i("starwisp","Drag exited "+v );
+                                //Log.i("starwisp","Drag exited "+v );
                                 v.getBackground().setColorFilter(null);
                                 return true;
                             }
                             case DragEvent.ACTION_DROP: {
                                 v.getBackground().setColorFilter(null);
-                                Log.i("starwisp","Drag dropped "+v );
+                                //Log.i("starwisp","Drag dropped "+v );
                                 View otherw = (View)event.getLocalState();
-                                Log.i("starwisp","removing from parent "+((View)otherw.getParent()).getId());
+                                //Log.i("starwisp","removing from parent "+((View)otherw.getParent()).getId());
 
                                 // check we are not adding to ourself
                                 if (id!=otherw.getId()) {
                                     ((ViewManager)otherw.getParent()).removeView(otherw);
-                                    Log.i("starwisp","adding to " + id);
+                                    //Log.i("starwisp","adding to " + id);
 
                                     if (!behaviour_type.equals("drop-only-consume")) {
                                         v.addView(otherw);
@@ -397,22 +397,22 @@ public class StarwispBuilder
                                 return true;
                             }
                             case DragEvent.ACTION_DRAG_ENDED: {
-                                Log.i("starwisp","Drag ended "+v );
+                                //Log.i("starwisp","Drag ended "+v );
                                 v.getBackground().setColorFilter(null);
 
                                 View dragee = (View)event.getLocalState();
                                 dragee.setVisibility(View.VISIBLE);
 
                                 if (event.getResult()) {
-                                    Log.i("starwisp","sucess " );
+                                    //Log.i("starwisp","sucess " );
                                 } else {
-                                    Log.i("starwisp","fail " );
+                                    //Log.i("starwisp","fail " );
                                 };
                                 return true;
                             }
                                 // An unknown action type was received.
                             default:
-                                Log.e("starwisp","Unknown action type received by OnDragListener.");
+                                //Log.e("starwisp","Unknown action type received by OnDragListener.");
                                 break;
                             };
                             return true;
@@ -653,7 +653,9 @@ public class StarwispBuilder
                 if (inputtype.equals("text")) {
                     //v.setInputType(InputType.TYPE_CLASS_TEXT);
                 } else if (inputtype.equals("numeric")) {
-                    v.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                    v.setInputType(InputType.TYPE_CLASS_NUMBER|
+                                   InputType.TYPE_NUMBER_FLAG_DECIMAL|
+                                   InputType.TYPE_NUMBER_FLAG_SIGNED);
                 } else if (inputtype.equals("email")) {
                     v.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS);
                 }
@@ -814,7 +816,7 @@ public class StarwispBuilder
                 String arg = "'(";
                 for (List<String> e : info) {
                     arg+="("+e.get(0)+" "+e.get(1)+")";
-                    Log.i("starwisp","converting prop "+arg);
+                    //Log.i("starwisp","converting prop "+arg);
                 }
                 arg+=")";
                 m_Scheme.eval("(set! camera-properties "+arg+")");
@@ -1366,8 +1368,13 @@ public class StarwispBuilder
 
             if (token.equals("background-colour")) {
                 JSONArray col = arr.getJSONArray(3);
-                //vv.setBackgroundColor();
-                vv.getBackground().setColorFilter(Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2)), PorterDuff.Mode.MULTIPLY);
+
+                if (type.equals("linear-layout")) {
+                    vv.setBackgroundColor(Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2)));
+                } else {
+                    //vv.setBackgroundColor();
+                    vv.getBackground().setColorFilter(Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2)), PorterDuff.Mode.MULTIPLY);
+                }
                 vv.invalidate();
                 return;
             }
@@ -1773,6 +1780,7 @@ public class StarwispBuilder
                 if (is_atom==0) ret+=")";
             } catch (JSONException e) {
                 Log.e("starwisp", "Error parsing draggable code " + e.toString());
+                Log.e("starwisp", "Code is: "+ret);
                 return "";
             }
         }
