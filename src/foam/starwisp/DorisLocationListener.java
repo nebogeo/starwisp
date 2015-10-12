@@ -39,19 +39,12 @@ import com.google.android.maps.OverlayItem;
 public class DorisLocationListener implements LocationListener {
 
 	protected static final int ONE_MINUTE = 60 * 1000;
-
 	protected static final int FIVE_MINUTES = 5 * ONE_MINUTE;
-
 	protected static final int ACCURACY_THRESHOLD = 30; // in meters
-
 	protected MapView mapView;
-
 	protected MapController mapController;
-
 	protected LocationManager locationManager;
-
 	protected Location currrentLocation;
-
     String m_CallbackName;
     StarwispActivity m_Context;
     StarwispBuilder m_Builder;

@@ -693,6 +693,24 @@ public class StarwispBuilder
                 parent.addView(v);
             }
 
+            if (type.equals("colour-button")) {
+                Button v = new Button(ctx);
+                v.setId(arr.getInt(1));
+                v.setText(arr.getString(2));
+                v.setTextSize(arr.getInt(3));
+                v.setLayoutParams(BuildLayoutParams(arr.getJSONArray(4)));
+                v.setTypeface(((StarwispActivity)ctx).m_Typeface);
+                JSONArray col = arr.getJSONArray(6);
+                v.getBackground().setColorFilter(Color.argb(col.getInt(3), col.getInt(0), col.getInt(1), col.getInt(2)), PorterDuff.Mode.MULTIPLY);
+                final String fn = arr.getString(5);
+                v.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        Callback(ctx,ctxname,v.getId());
+                    }
+                });
+                parent.addView(v);
+            }
+
             if (type.equals("toggle-button")) {
                 ToggleButton v = new ToggleButton(ctx);
                 if (arr.getString(5).equals("fancy")) {
@@ -1756,6 +1774,17 @@ public class StarwispBuilder
         }
     }
 
+    public String JSONToScheme(String str) {
+        Log.i("starwisp","jsontoscheme "+str);
+        if (str.length()==0) return "";
+        if (str.equals(":")) return "";
+        if (str.length()>1 && str.charAt(0)==':') {
+            // convert to a symbol
+            return str.substring(1);
+        }
+        else return "\""+str+"\"";
+    }
+
     public String WalkDraggable(StarwispActivity ctx, String name, String ctxname, int id) {
         View v=ctx.findViewById(id);
         Class c = v.getClass();
@@ -1768,7 +1797,12 @@ public class StarwispBuilder
 
                 int is_atom = arr.getInt(0);
                 if (is_atom==0) ret+="(";
-                ret += arr.getString(1)+" ";
+
+                // a number?
+                if (is_atom==2) ret += arr.getString(1)+" ";
+                else ret += JSONToScheme(arr.getString(1))+" ";
+
+                Log.i("starwisp","post conv "+ret);
 
                 for (int i = 0; i < l.getChildCount(); i++) {
                     View cv = l.getChildAt(i);

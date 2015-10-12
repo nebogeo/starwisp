@@ -36,12 +36,15 @@ class SensorHandler implements SensorEventListener  {
     float[] m_Geomagnetic;
     float[] m_Orientation;
 
+    float m_Jerk;
+
     public SensorHandler(StarwispActivity c, StarwispBuilder b) {
         m_Context=c;
         m_Builder=b;
         m_SensorManager = (SensorManager)c.getSystemService(Context.SENSOR_SERVICE);
         m_Sensors =  m_SensorManager.getSensorList(Sensor.TYPE_ALL);
         m_Orientation = new float[3];
+        m_Jerk=0;
 
         //mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
