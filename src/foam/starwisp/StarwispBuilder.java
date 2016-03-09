@@ -140,6 +140,7 @@ public class StarwispBuilder
     SoundManager m_SoundManager;
     SensorHandler m_SensorHandler;
     View m_LastDragHighlighted;
+    BluetoothManager m_Bluetooth;
 
     // resize all camera images to this resolution
     static int PHOTO_WIDTH=640;
@@ -150,6 +151,7 @@ public class StarwispBuilder
         m_NetworkManager = new NetworkManager();
         m_Handler = new Handler();
         m_SoundManager = new SoundManager();
+        m_Bluetooth = new BluetoothManager();
     }
 
 
@@ -254,6 +256,10 @@ public class StarwispBuilder
     }
 
     public void Build(final StarwispActivity ctx, final String ctxname, JSONArray arr, ViewGroup parent) {
+
+        if (StarwispLinearLayout.m_DisplayMetrics==null) {
+            StarwispLinearLayout.m_DisplayMetrics = ctx.getResources().getDisplayMetrics();
+        }
 
         try {
             String type = arr.getString(0);
@@ -1210,6 +1216,16 @@ public class StarwispBuilder
                 photo(ctx,arr.getString(3),arr.getInt(4));
             }
 
+            if (token.equals("bluetooth")) {
+                final String name = arr.getString(3);
+                m_Bluetooth.Start((StarwispActivity)ctx,name,this);
+                return;
+            }
+
+            if (token.equals("bluetooth-send")) {
+                m_Bluetooth.Write(arr.getString(3));
+            }
+
             if (token.equals("process-image-in-place")) {
                 BitmapCache.ProcessInPlace(arr.getString(3));
             }
@@ -1692,6 +1708,8 @@ public class StarwispBuilder
                             public void onPictureTaken(byte[] input, Camera camera) {
                                 Log.i("starwisp","on picture taken...");
 
+                                // the version used by the uav app
+
                                 Bitmap original = BitmapFactory.decodeByteArray(input, 0, input.length);
                                 //Bitmap resized = Bitmap.createScaledBitmap(original, PHOTO_WIDTH, PHOTO_HEIGHT, true);
                                 ByteArrayOutputStream blob = new ByteArrayOutputStream();
@@ -1700,6 +1718,25 @@ public class StarwispBuilder
                                 String filename = path;
                                 Log.i("starwisp",path);
                                 SaveData(filename,blob.toByteArray());
+
+                                // burn gps into exif data
+                                if (m_GPS.currentLocation!=null) {
+                                    double latitude = m_GPS.currentLocation.getLatitude();
+                                    double longitude = m_GPS.currentLocation.getLongitude();
+
+                                    try {
+                                        ExifInterface exif = new ExifInterface(filename);
+                                        exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, GPS.convert(latitude));
+                                        exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, GPS.latitudeRef(latitude));
+                                        exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, GPS.convert(longitude));
+                                        exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, GPS.longitudeRef(longitude));
+                                        exif.saveAttributes();
+                                    } catch (IOException e) {
+                                        Log.i("starwisp","Couldn't open "+filename+" to add exif data: ioexception caught.");
+                                    }
+
+                                }
+
                                 v.TakenPicture();
                             }
                         });

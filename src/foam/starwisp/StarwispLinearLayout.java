@@ -24,9 +24,12 @@ import org.json.JSONArray;
 import android.view.ViewGroup;
 import android.graphics.Color;
 import android.util.Log;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 public class StarwispLinearLayout
 {
+    public static DisplayMetrics m_DisplayMetrics;
 
     public static int BuildOrientation(String p) {
         if (p.equals("vertical")) return LinearLayout.VERTICAL;
@@ -47,7 +50,8 @@ public class StarwispLinearLayout
         if (p.equals("match-parent")) return LayoutParams.MATCH_PARENT;
         if (p.equals("wrap-content")) return LayoutParams.WRAP_CONTENT;
         try {
-            return Integer.parseInt(p);
+            return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Integer.parseInt(p), m_DisplayMetrics));
+            //return Integer.parseInt(p);
         } catch (NumberFormatException e) {
             Log.i("starwisp", "Layout error with ["+p+"]");
             // send error message

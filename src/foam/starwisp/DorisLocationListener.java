@@ -44,7 +44,7 @@ public class DorisLocationListener implements LocationListener {
 	protected MapView mapView;
 	protected MapController mapController;
 	protected LocationManager locationManager;
-	protected Location currrentLocation;
+	protected Location currentLocation;
     String m_CallbackName;
     StarwispActivity m_Context;
     StarwispBuilder m_Builder;
@@ -112,18 +112,12 @@ public class DorisLocationListener implements LocationListener {
 		setBestLocation(lastNetLocation, lastGpsLocation);
 		// If chosen location is more than a minute old, start querying
 		// network/GPS
-		if (currrentLocation == null
-            || (new Date()).getTime() - currrentLocation.getTime() > ONE_MINUTE) {
-			if (netAvailable) {
-				locationManager.requestLocationUpdates(
-                    //LocationManager.NETWORK_PROVIDER, 500, 5, this);
-                    LocationManager.NETWORK_PROVIDER, m_MinMSecs, m_MinMetres, this);
+        if (netAvailable) {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, m_MinMSecs, m_MinMetres, this);
 			}
-			if (gpsAvailable) {
-				locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, m_MinMSecs, m_MinMetres, this);
-			}
-		}
+        if (gpsAvailable) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, m_MinMSecs, m_MinMetres, this);
+        }
 	}
 
 	public void startLocating() {
@@ -180,6 +174,7 @@ public class DorisLocationListener implements LocationListener {
 
 	public void onLocationChanged(Location location) {
 		if (location != null) {
+            currentLocation = location;
 			locationChanged(location.getLatitude(), location.getLongitude());
 /*			if (location.hasAccuracy()
 					&& location.getAccuracy() < ACCURACY_THRESHOLD) {

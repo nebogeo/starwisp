@@ -481,6 +481,8 @@
 (define (http-request name url fn) (list "http-request" 0 "http-request" name fn url))
 (define (http-download name url filename) (list "http-download" 0 "http-download" name filename url))
 (define (send-mail to subject body attachments) (list "send-mail" 0 "send-mail" to subject body attachments))
+(define (bluetooth name fn) (list "bluetooth" 0 "bluetooth" name fn))
+(define (bluetooth-send data) (list "bluetooth-send" 0 "bluetooth-send" data))
 
 (define (dialog-fragment id layout fragment-name fn)
   (list "dialog-fragment" 0 "dialog-fragment" id layout fragment-name fn))
@@ -771,6 +773,7 @@
                   (equal? (list-ref event 0) "list-files")
                   (equal? (list-ref event 0) "http-request")
                   (equal? (list-ref event 0) "network-connect")
+                  (equal? (list-ref event 0) "bluetooth")
                   (equal? (list-ref event 0) "delayed"))
                  (add-new-dialog! event)))
          events)))
