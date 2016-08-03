@@ -177,10 +177,12 @@ public class StarwispBuilder
     public void DialogCallback(StarwispActivity ctx, String ctxname, String name, String args)
     {
         try {
+	    // fixme - quoting args means '() doesn't work!
             String ret=m_Scheme.eval("(dialog-callback \""+name+"\" '("+args+"))");
             UpdateList(ctx, ctxname, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
+	    Log.e("starwisp", "ctx:"+ctxname+" name:"+name+" args:"+args);
         }
     }
 
@@ -192,16 +194,19 @@ public class StarwispBuilder
             UpdateList(ctx, ctxname, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
+	    Log.e("starwisp", "ctx:"+ctxname+" wid:"+wid);
         }
     }
 
     private void CallbackArgs(StarwispActivity ctx, String ctxname, int wid, String args)
     {
         try {
+	    // fixme - quoting args means '() doesn't work!
             String ret=m_Scheme.eval("(widget-callback \""+ctxname+"\" "+wid+" '("+args+"))");
             UpdateList(ctx, ctxname, new JSONArray(ret));
         } catch (JSONException e) {
             Log.e("starwisp", "Error parsing data " + e.toString());
+	    Log.e("starwisp", "ctx:"+ctxname+" wid:"+wid+" args:"+args);
         }
     }
 
@@ -503,7 +508,7 @@ public class StarwispBuilder
                             String fragname = items.getString(position);
                             return ActivityManager.GetFragment(fragname);
                         } catch (JSONException e) {
-                            Log.e("starwisp", "Error parsing data " + e.toString());
+                            Log.e("starwisp", "Error parsing fragment data " + e.toString());
                         }
                         return null;
                     }
@@ -923,18 +928,31 @@ public class StarwispBuilder
                 Update((StarwispActivity)ctx,ctxname,new JSONArray(arr.getString(i)));
             }
         } catch (JSONException e) {
-            Log.e("starwisp", "Error parsing data " + e.toString());
+            Log.e("starwisp", "Error parsing updatelist data " + e.toString());
         }
     }
 
     public void Update(final StarwispActivity ctx, final String ctxname, JSONArray arr) {
-        try {
 
-            String type = arr.getString(0);
-            final Integer id = arr.getInt(1);
-            String token = arr.getString(2);
+	String type="";
+	Integer tid=0;
+	String token="";
+
+	try {
+	    
+            type = arr.getString(0);
+            tid = arr.getInt(1);
+            token = arr.getString(2);
+
+	} catch (JSONException e) {
+	    Log.e("starwisp", "Error parsing update arguments for "+ctxname+" "+arr.toString() + e.toString());
+	}
+
+	final Integer id=tid;
 
             //Log.i("starwisp", "Update: "+type+" "+id+" "+token);
+
+	try {
 
             // non widget commands
             if (token.equals("toast")) {
@@ -1525,7 +1543,7 @@ public class StarwispBuilder
                                             }
                                         }
                                     } catch (JSONException e) {
-                                        Log.e("starwisp", "Error parsing data " + e.toString());
+                                        Log.e("starwisp", "Error parsing on click data " + e.toString());
                                     }
 
                                     CallbackArgs(ctx,ctxname,id,""+v.getId()+" #t");
@@ -1573,7 +1591,7 @@ public class StarwispBuilder
                                 String fragname = items.getString(position);
                                 return ActivityManager.GetFragment(fragname);
                             } catch (JSONException e) {
-                                Log.e("starwisp", "Error parsing data " + e.toString());
+                                Log.e("starwisp", "Error parsing pages data " + e.toString());
                             }
                             return null;
                         }
@@ -1805,10 +1823,11 @@ public class StarwispBuilder
                 }
                 return;
             }
-
-        } catch (JSONException e) {
-            Log.e("starwisp", "Error parsing data " + e.toString());
-        }
+	    
+	    } catch (JSONException e) {
+		Log.e("starwisp", "Error parsing builder data " + e.toString());
+		Log.e("starwisp", "type:"+type+" id:"+id+" token:"+token);
+	    }
     }
 
     public String JSONToScheme(String str) {
